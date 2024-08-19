@@ -6,7 +6,7 @@ import App from "./app.js";
 
 const man = `
 	Usage
-	  $ npm init @pmndrs [dst]
+	  $ npx pmndrs/create [myapp]
 `;
 
 const cli = meow(man, {

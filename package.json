@@ -2,7 +2,7 @@
   "name": "@pmndrs/create",
   "version": "1.0.1",
   "license": "MIT",
-  "bin": "npx tsx ./source/cli.tsx",
+  "bin": "npx tsx ./src/cli.tsx",
   "type": "module",
   "engines": {
     "node": ">=20"
