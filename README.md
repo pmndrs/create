@@ -1,5 +1,5 @@
 ```sh
-$ npx pmndrs/create myapp
+$ npm init @pmndrs
   aquarium
 ❯ basic-demo
   clouds
@@ -9,5 +9,17 @@ $ npx pmndrs/create myapp
 
 ```
 $ npm ci
-$ npx tsx source/cli.tsx
+```
+
+# build
+
+```sh
+$ npm run build
+$ node dist/cli.js
+```
+
+# dev
+
+```sh
+$ npm run dev
 ```

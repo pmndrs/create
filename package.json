@@ -1,15 +1,19 @@
 {
   "name": "@pmndrs/create",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "license": "MIT",
-  "bin": "npx tsx ./source/cli.tsx",
+  "bin": "node dist/cli.js",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "start": "node dist/cli.js",
+    "dev": "tsx source/cli.tsx"
   },
   "dependencies": {
     "degit": "^2.8.4",
@@ -21,10 +25,11 @@
   "devDependencies": {
     "@sindresorhus/tsconfig": "^6.0.0",
     "@types/degit": "^2.8.6",
+    "@types/node": "^22.4.1",
     "@types/react": "^18.3.3",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "ts-node": "^10.9.2",
+    "semantic-release": "^24.1.0",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4"
   },
