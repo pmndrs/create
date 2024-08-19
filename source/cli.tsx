@@ -4,26 +4,14 @@ import { render } from "ink";
 import meow from "meow";
 import App from "./app.js";
 
-const cli = meow(
-  `
+const man = `
 	Usage
-	  $ create
+	  $ npm init @pmndrs [dst]
+`;
 
-	Options
-		--name  Your name
+const cli = meow(man, {
+  importMeta: import.meta,
+});
+const [dst] = cli.input;
 
-	Examples
-	  $ create --name=Jane
-	  Hello, Jane
-`,
-  {
-    importMeta: import.meta,
-    flags: {
-      name: {
-        type: "string",
-      },
-    },
-  }
-);
-
-render(<App name={cli.flags.name} />);
+render(<App dst={dst} />);

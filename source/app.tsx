@@ -1,6 +1,7 @@
 import React from "react";
 import SelectInput from "ink-select-input";
 import degit from "degit";
+import { resolve } from "path";
 
 const items = [
   {
@@ -18,22 +19,20 @@ const items = [
 ];
 type Item = (typeof items)[number];
 
-export default function App({ name }: { name?: string }) {
-  console.log(name);
-
+export default function App({ dst = "." }: { dst?: string }) {
   const handleSelect = async ({ value: repository }: Item) => {
-    console.log(`Selected: ${repository}`);
-
     const emitter = degit(repository, {
       // cache: true,
       // force: true,
-      // verbose: true,
+      verbose: true,
     });
     emitter.on("info", (info) => {
       console.log(info.message);
     });
 
-    await emitter.clone(process.cwd());
+    await emitter.clone(resolve(dst));
+    console.log(`Now, run: cd ${dst} && npm i && npm run dev`);
+    process.exit(0);
   };
 
   return <SelectInput items={items} onSelect={handleSelect} />;
