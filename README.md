@@ -9,10 +9,5 @@ $ npx pmndrs/create myapp
 
 ```
 $ npm ci
-```
-
-# Dev
-
-```
-$ npx tsx src/cli.tsx
+$ npx tsx source/cli.tsx
 ```
