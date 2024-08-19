@@ -1,5 +1,8 @@
 ```sh
-$ npm init @pmndrs
+$ npx pmndrs/create myapp
+  aquarium
+❯ basic-demo
+  clouds
 ```
 
 # INSTALL
