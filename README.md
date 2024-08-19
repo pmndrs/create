@@ -9,6 +9,5 @@ $ npx pmndrs/create myapp
 
 ```
 $ npm ci
-$ npm run build
-$ node dist/cli.js
+$ npx tsx source/cli.tsx
 ```
