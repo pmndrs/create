@@ -31,7 +31,7 @@ export function App() {
           }}
         />
 
-        <div className="xl:col-start-3 xl:col-end-13">
+        <div className="xl:col-start-3 xl:col-end-13 divide-y divide-redesign-gray">
           {packages.map((pkg) => (
             <ListItem
               key={pkg.id}

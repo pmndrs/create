@@ -12,7 +12,7 @@ interface PackageCardProps {
 export const ListItem = ({ package: pkg, isSelected, onToggle }: PackageCardProps) => {
   return (
     <button
-      className={cn('flex items-start border-b border-redesign-gray flex-col md:flex-row w-full text-start')}
+      className={cn('flex items-start flex-col md:flex-row w-full text-start')}
       onClick={onToggle}
       aria-pressed={isSelected}
       aria-label={`Select ${pkg.name} package`}
@@ -26,17 +26,17 @@ export const ListItem = ({ package: pkg, isSelected, onToggle }: PackageCardProp
       </div>
       <div className="col-span-2 flex flex-col p-4 xl:px-2 justify-center flex-2/10">
         <div className="flex gap-4 justify-end">
-          <Link 
-            href={pkg.docsUrl} 
-            isExternal 
+          <Link
+            href={pkg.docsUrl}
+            isExternal
             className="flex items-center gap-1"
             aria-label={`View documentation for ${pkg.name}`}
           >
             <p>docs</p>
           </Link>
-          <Link 
-            href={pkg.githubUrl} 
-            isExternal 
+          <Link
+            href={pkg.githubUrl}
+            isExternal
             className="flex items-center gap-1"
             aria-label={`View ${pkg.name} on GitHub`}
           >
