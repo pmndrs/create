@@ -14,20 +14,32 @@ export const ListItem = ({ package: pkg, isSelected, onToggle }: PackageCardProp
     <button
       className={cn('flex items-start border-b border-redesign-gray flex-col md:flex-row w-full text-start')}
       onClick={onToggle}
+      aria-pressed={isSelected}
+      aria-label={`Select ${pkg.name} package`}
     >
       <div className="col-span-3 flex-3/10  p-4 xl:px-2 flex flex-row items-center gap-4">
         <SelectBox selected={isSelected} />
-        <p className="font-bold">{pkg.name}</p>
+        <h3 className="font-bold">{pkg.name}</h3>
       </div>
       <div className="col-span-5 flex flex-col p-4 xl:px-2 flex-5/10">
         <p className="text-redesign-white/50 text-sm">{pkg.description}</p>
       </div>
       <div className="col-span-2 flex flex-col p-4 xl:px-2 justify-center flex-2/10">
         <div className="flex gap-4 justify-end">
-          <Link href={pkg.docsUrl} isExternal className="flex items-center gap-1">
+          <Link 
+            href={pkg.docsUrl} 
+            isExternal 
+            className="flex items-center gap-1"
+            aria-label={`View documentation for ${pkg.name}`}
+          >
             <p>docs</p>
           </Link>
-          <Link href={pkg.githubUrl} isExternal className="flex items-center gap-1">
+          <Link 
+            href={pkg.githubUrl} 
+            isExternal 
+            className="flex items-center gap-1"
+            aria-label={`View ${pkg.name} on GitHub`}
+          >
             <p>github</p>
           </Link>
         </div>
