@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { NavBar } from './navbar'
 import { useMemo, useEffect } from 'react'
 import * as THREE from 'three'
+import { createShaderMaterial } from './shader-material'
 
 export const Hero = () => {
   return (
@@ -14,7 +15,7 @@ export const Hero = () => {
           <h1 className="text-4xl text-balance">BUILDING COOL 3D EXPERIENCES WITH THE REACT THREE ECOSYSTEM.</h1>
         </div>
       </div>
-      <div className="w-full h-80 col-start-7 col-end-13 ">
+      <div className="w-full h-80 col-start-7 col-end-13 border-b xl:border-b-0 xl:border-l border-redesign-gray">
         <Canvas camera={{ position: [0, 0, 5], fov: 20 }}>
           <ambientLight intensity={0.5} />
           <axesHelper args={[1]} />
@@ -54,3 +55,5 @@ const CameraPlane = () => {
     </mesh>
   )
 }
+
+
