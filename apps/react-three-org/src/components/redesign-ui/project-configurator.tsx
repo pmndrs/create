@@ -68,7 +68,7 @@ export const ProjectConfigurator = ({ selections, createGithubRepo }: ProjectCon
         </button>
       </div>
       <div className="w-full flex flex-col md:flex-row items-center gap-4">
-        <p className="w-full text-base text-redesign-white/50">
+        <p className="w-full hidden md:block text-base text-redesign-white/50">
           {selections.length} {selections.length === 1 ? 'package' : 'packages'} selected
         </p>
         <div className="flex items-center gap-2 w-full justify-end">

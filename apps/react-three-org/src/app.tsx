@@ -1,9 +1,10 @@
 import { PackageIDs, packages, ToolIDs, tools } from '@/lib/packages'
 import { useState } from 'react'
-import { ProjectConfigurator, FilterType, GithubRepo } from './components/redesign-ui'
+import { ProjectConfigurator, FilterType, GithubRepo, SelectBox } from './components/redesign-ui'
 import { Toaster } from 'sonner'
 import { Hero } from './components/redesign-ui/hero'
 import { ListItem } from './components/redesign-ui/list-item'
+import { useIsMobile } from './hooks/use-mobile'
 
 const searchParams = new URLSearchParams(location.search)
 
@@ -11,6 +12,10 @@ export function App() {
   const [state, setState] = useState(() => searchParams.get('state'))
   const [selectedPackages, setSelectedPackages] = useState<PackageIDs[]>([])
   const [selectedTools, setSelectedTools] = useState<ToolIDs[]>(['triplex'])
+  const allPackagesSelected = packages.every((pkg) => selectedPackages.includes(pkg.id))
+  const allToolsSelected = tools.every((tool) => selectedTools.includes(tool.id))
+
+  const isMobile = useIsMobile()
 
   if (state != null) {
     return <GithubRepo state={state} />
@@ -32,6 +37,23 @@ export function App() {
         />
 
         <div className="xl:col-start-3 xl:col-end-13 divide-y divide-redesign-gray">
+          {isMobile && (
+            <div className="xl:hidden border-b border-redesign-gray">
+              <button
+                className="w-full p-4 flex gap-4 justify-between"
+                onClick={() => {
+                  setSelectedPackages(allPackagesSelected ? [] : packages.map((pkg) => pkg.id))
+                }}
+                aria-pressed={allPackagesSelected}
+                aria-label="All packages"
+              >
+                <p role="heading" aria-level={3}>
+                  / ALL PACKAGES
+                </p>
+                <SelectBox selected={allPackagesSelected} />
+              </button>
+            </div>
+          )}
           {packages.map((pkg) => (
             <ListItem
               key={pkg.id}
@@ -44,6 +66,24 @@ export function App() {
               }}
             />
           ))}
+
+          {isMobile && (
+            <div className="xl:hidden border-b border-redesign-gray">
+              <button
+                className="w-full p-4 flex gap-4 justify-between"
+                onClick={() => {
+                  setSelectedTools(allToolsSelected ? [] : tools.map((tool) => tool.id))
+                }}
+                aria-pressed={allToolsSelected}
+                aria-label="All tools"
+              >
+                <p role="heading" aria-level={3}>
+                  / ALL TOOLS
+                </p>
+                <SelectBox selected={allToolsSelected} />
+              </button>
+            </div>
+          )}
           {tools.map((pkg) => (
             <ListItem
               key={pkg.id}
