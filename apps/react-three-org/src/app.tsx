@@ -6,8 +6,6 @@ import { Hero } from './components/redesign-ui/hero'
 import { ListItem } from './components/redesign-ui/list-item'
 
 const searchParams = new URLSearchParams(location.search)
-const sessionAccessTokenKey = 'access_token'
-const sessionAccessToken = sessionStorage.getItem(sessionAccessTokenKey)
 
 export function App() {
   const [state, setState] = useState(() => searchParams.get('state'))
