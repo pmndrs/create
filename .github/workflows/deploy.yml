@@ -56,24 +56,14 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-          run_install: false
-
-      - name: Build pruned github app
-        run: |
-          pnpm -F github-app... install
-          pnpm -F github-app... build
-          echo "inject-workspace-packages=true" >> ./.npmrc
-          pnpm -F github-app... install --no-frozen-lockfile
-          pnpm -F github-app deploy --prod ./apps/github/pruned
-
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
+      - name: Deploy pick app
+        run: flyctl deploy --dockerfile apps/pick/Dockerfile --config apps/pick/fly.toml --local-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
       - name: Deploy github app
-        working-directory: ./apps/github
-        run: flyctl deploy --remote-only
+        run: flyctl deploy --dockerfile apps/github/Dockerfile --config apps/github/fly.toml --local-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

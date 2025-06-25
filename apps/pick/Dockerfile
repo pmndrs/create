@@ -10,13 +10,13 @@ WORKDIR /app
 COPY . .
 
 # Run the pnpm commands as specified
-RUN pnpm -F github-app... install
-RUN pnpm -F github-app... build
+RUN pnpm -F react-three-create-pick-proxy... install
+RUN pnpm -F react-three-create-pick-proxy... build
 RUN echo "inject-workspace-packages=true" >> ./.npmrc
-RUN pnpm -F github-app... install --no-frozen-lockfile
+RUN pnpm -F react-three-create-pick-proxy... install --no-frozen-lockfile
 # Update package.json main fields to point to dist folders
 RUN pnpm -F "./packages/*" exec -- npm pkg set main=dist/index.js
-RUN pnpm -F github-app deploy --prod ./pruned
+RUN pnpm -F react-three-create-pick-proxy deploy --prod ./pruned
 
 # Production stage
 FROM node:20-slim AS production
