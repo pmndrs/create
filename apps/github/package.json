@@ -1,5 +1,5 @@
 {
-  "name": "github-app",
+  "name": "react-three-create-gh",
   "type": "module",
   "dependencies": {
     "@dotenvx/dotenvx": "^1.43.0",
