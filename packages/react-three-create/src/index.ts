@@ -14,10 +14,12 @@ import { generateZustand, GenerateZustandOptions } from './integrations/zustand.
 import { generateTriplex, GenerateTriplexOptions } from './integrations/triplex.js'
 import { merge } from './merge.js'
 
+export * from "./utils.js"
+
 export type GenerateOptions = {
   githubUserName?: string
   githubRepoName?: string
-  name?: string
+  name: string
   language?: 'javascript' | 'typescript'
   fiber?: GenerateFiberOptions
   handle?: GenerateHandleOptions

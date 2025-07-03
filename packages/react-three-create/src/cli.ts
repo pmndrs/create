@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { cwd } from 'process'
-import { generate, GenerateOptions } from './index.js'
+import { generate, GenerateOptions, generateRandomName } from './index.js'
 import { dirname, join } from 'path'
 import { mkdir, writeFile } from 'fs/promises'
 import { Command } from 'commander'
@@ -38,7 +38,7 @@ async function loadOptionsFromUrl(url: string): Promise<GenerateOptions> {
   }
 }
 
-async function promptForOptions(name: string | undefined): Promise<GenerateOptions> {
+async function promptForOptions(name: string): Promise<GenerateOptions> {
   let cancelled = false
   if (name == null) {
     name = (
@@ -195,12 +195,12 @@ async function main() {
       'Skip automatically installing dependencies, starting the dev server, and opening the browser after project creation',
     )
     .option('-y, --yes', 'Skip prompts and use default values')
-    .action(async (name: string | undefined, options: CliOptions) => {
+    .action(async (name: string = generateRandomName(), options: CliOptions) => {
       let generateOptions: GenerateOptions
 
       if (options.url) {
         generateOptions = await loadOptionsFromUrl(options.url)
-        generateOptions.name = name ?? generateOptions.name
+        generateOptions.name ??= name
       } else if (Object.keys(options).length > 0) {
         generateOptions = {
           name,

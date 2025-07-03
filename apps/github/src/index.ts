@@ -1,4 +1,4 @@
-import { generate } from '@react-three/create'
+import { generate, generateRandomName } from '@react-three/create'
 import Fastify from 'fastify'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import z from 'zod'
@@ -13,7 +13,11 @@ const oauthApp = new OAuthApp({
   clientSecret: process.env.CLIENT_SECRET!,
 })
 
-const server = Fastify()
+const server = Fastify({
+  logger: {
+    level: 'error',
+  },
+})
 
 await server.register(cors)
 
@@ -76,89 +80,6 @@ server
       }
     },
   )
-
-/**
- * Generates a random name in the format "adjective-noun"
- * @returns A randomly generated name string
- */
-function generateRandomName(): string {
-  const adjectives = [
-    'red',
-    'blue',
-    'green',
-    'yellow',
-    'purple',
-    'orange',
-    'pink',
-    'black',
-    'white',
-    'tiny',
-    'big',
-    'small',
-    'large',
-    'huge',
-    'giant',
-    'mini',
-    'mega',
-    'super',
-    'happy',
-    'sad',
-    'angry',
-    'calm',
-    'quiet',
-    'loud',
-    'silent',
-    'noisy',
-    'shiny',
-    'dull',
-    'bright',
-    'dark',
-    'fuzzy',
-    'smooth',
-    'rough',
-    'soft',
-  ]
-
-  const nouns = [
-    'apple',
-    'banana',
-    'cherry',
-    'date',
-    'elderberry',
-    'fig',
-    'grape',
-    'honeydew',
-    'cat',
-    'dog',
-    'elephant',
-    'fox',
-    'giraffe',
-    'horse',
-    'iguana',
-    'jaguar',
-    'mountain',
-    'river',
-    'ocean',
-    'desert',
-    'forest',
-    'jungle',
-    'meadow',
-    'valley',
-    'star',
-    'moon',
-    'sun',
-    'planet',
-    'comet',
-    'asteroid',
-    'galaxy',
-    'universe',
-  ]
-
-  const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)]
-  const randomNoun = nouns[Math.floor(Math.random() * nouns.length)]
-
-  return `${randomAdjective}-${randomNoun}`
-}
 
 const start = async () => {
   try {
