@@ -41,6 +41,7 @@ const GenerateOptionsSchema = z.object({
   xr: z.boolean().optional(),
   triplex: z.boolean().optional(),
   zustand: z.boolean().optional(),
+  viverse: z.boolean().optional(),
 })
 
 server
