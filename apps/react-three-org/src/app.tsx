@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { PackageCard } from '@/components/package-card'
 import { ProjectConfigurator } from '@/components/project-configurator'
 import { NavBar } from '@/components/nav-bar'
-import { packages, tools, PackageIDs, ToolIDs } from '@/lib/packages'
+import { packages, addons, PackageIDs, ToolIDs } from '@/lib/packages'
 import { BackgroundAnimation } from '@/components/background-animation'
 import { CogIcon, PackageIcon } from 'lucide-react'
 import { Toaster } from 'sonner'
@@ -17,7 +17,7 @@ const sessionAccessToken = sessionStorage.getItem(sessionAccessTokenKey)
 export function App() {
   const [state, setState] = useState(() => searchParams.get('state'))
   const [selectedPackages, setSelectedPackages] = useState<PackageIDs[]>([])
-  const [selectedTools, setSelectedTools] = useState<ToolIDs[]>(['triplex'])
+  const [selectedAddons, setSelectedAddons] = useState<ToolIDs[]>([])
 
   if (state != null) {
     return <GithubRepo state={state} />
@@ -65,21 +65,21 @@ export function App() {
         <div className="mb-10 mt-8"></div>
 
         <SelectionSection
-          label="tools"
-          value={selectedTools}
+          label="addons"
+          value={selectedAddons}
           icon={CogIcon}
-          onChange={setSelectedTools}
-          options={tools}
+          onChange={setSelectedAddons}
+          options={addons}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {tools.map((pkg) => (
+          {addons.map((pkg) => (
             <PackageCard
               key={pkg.id}
               package={pkg}
-              isSelected={selectedTools.includes(pkg.id)}
+              isSelected={selectedAddons.includes(pkg.id)}
               onToggle={() => {
-                setSelectedTools((prev) =>
+                setSelectedAddons((prev) =>
                   prev.includes(pkg.id) ? prev.filter((id) => id !== pkg.id) : [...prev, pkg.id],
                 )
               }}
@@ -90,14 +90,14 @@ export function App() {
         <ProjectConfigurator
           createGithubRepo={() => {
             const integrations: any = {}
-            const selections = [...selectedPackages, ...selectedTools]
+            const selections = [...selectedPackages, ...selectedAddons]
             for (const integration of selections) {
               integrations[integration] = true
             }
 
             setState(btoa(JSON.stringify(integrations)))
           }}
-          selections={[...selectedPackages, ...selectedTools]}
+          selections={[...selectedPackages, ...selectedAddons]}
         />
       </div>
       <Toaster

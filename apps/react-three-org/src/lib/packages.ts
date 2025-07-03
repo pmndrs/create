@@ -2,7 +2,7 @@ export interface Package {
   id: string
   name: string
   description: string
-  githubUrl: string
+  githubUrl?: string
   docsUrl: string
 }
 export const packages: Package[] = [
@@ -82,7 +82,7 @@ export const packages: Package[] = [
   },
 ] as const satisfies Package[]
 
-export const tools = [
+export const addons = [
   {
     id: 'triplex',
     name: 'Triplex',
@@ -90,8 +90,14 @@ export const tools = [
     githubUrl: 'https://github.com/try-triplex/triplex',
     docsUrl: 'https://triplex.dev/docs/get-started',
   },
+  {
+    id: 'viverse',
+    name: 'Viverse',
+    description: 'Deploy your 3D web apps to the open-platform metaverse ecosystem from HTC.',
+    docsUrl: 'https://docs.viverse.com/',
+  },
 ] as const satisfies Package[]
 
-export type ToolIDs = (typeof tools)[number]['id']
+export type ToolIDs = (typeof addons)[number]['id']
 
 export type PackageIDs = (typeof packages)[number]['id']

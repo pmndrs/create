@@ -35,17 +35,29 @@ export function PackageCard({ package: pkg, isSelected, onToggle }: PackageCardP
       <div className="grow"></div>
       <CardFooter className="flex gap-2 pt-0">
         <a href={pkg.docsUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" className="border-white/20 hover:bg-white/10" aria-label={`View ${pkg.name} documentation`}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="border-white/20 hover:bg-white/10"
+            aria-label={`View ${pkg.name} documentation`}
+          >
             <BookOpen className="h-4 w-4 mr-2" />
             Docs
           </Button>
         </a>
-        <a href={pkg.githubUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" className="border-white/20 hover:bg-white/10" aria-label={`View ${pkg.name} on GitHub`}>
-            <GithubIcon className="h-4 w-4 mr-2" />
-            GitHub
-          </Button>
-        </a>
+        {pkg.githubUrl != null && (
+          <a href={pkg.githubUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="border-white/20 hover:bg-white/10"
+              aria-label={`View ${pkg.name} on GitHub`}
+            >
+              <GithubIcon className="h-4 w-4 mr-2" />
+              GitHub
+            </Button>
+          </a>
+        )}
       </CardFooter>
     </Card>
   )

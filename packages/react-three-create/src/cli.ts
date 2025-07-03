@@ -116,6 +116,7 @@ async function promptForOptions(name: string): Promise<GenerateOptions> {
         { title: 'Zustand', value: 'zustand', selected: true },
         { title: 'Koota', value: 'koota', selected: true },
         { title: 'Triplex', value: 'triplex', selected: true },
+        { title: 'Viverse', value: 'viverse', selected: true },
       ],
     },
   ] satisfies Array<PromptObject>
@@ -145,6 +146,7 @@ async function promptForOptions(name: string): Promise<GenerateOptions> {
     zustand: answers.integrations?.includes('zustand') ? {} : undefined,
     koota: answers.integrations?.includes('koota') ? {} : undefined,
     triplex: answers.integrations?.includes('triplex') ? {} : undefined,
+    viverse: answers.integrations?.includes('viverse') ? {} : undefined,
     packageManager: answers.packageManager === 'custom' ? answers.customPackageManager : answers.packageManager,
     skipSetup: answers.skipSetup,
   }
@@ -165,6 +167,7 @@ interface CliOptions {
   zustand?: boolean
   koota?: boolean
   triplex?: boolean
+  viverse?: boolean
   'package-manager'?: string
   'skip-setup'?: boolean
   yes?: boolean
@@ -175,7 +178,7 @@ async function main() {
     .name('Create React Three')
     .description('Official CLI for creating React Three Fiber projects')
     .argument('[name]', 'name for the app')
-    .option('--url <url>', 'URL to the create options from')
+    .option('--url <url>', 'URL to load the create options from')
     .option('--js', 'use javascript')
     .option('--ts', 'use typescript (default)')
     .option('--drei', 'add @react-three/drei')
@@ -189,13 +192,14 @@ async function main() {
     .option('--zustand', 'add zustand')
     .option('--koota', 'add koota')
     .option('--triplex', 'set up triplex development environment')
+    .option('--viverse', 'set up viverse deployment')
     .option('--package-manager <manager>', 'specify package manager (e.g. npm, yarn, pnpm)')
     .option(
       '--skip-setup',
       'Skip automatically installing dependencies, starting the dev server, and opening the browser after project creation',
     )
     .option('-y, --yes', 'Skip prompts and use default values')
-    .action(async (name: string = generateRandomName(), options: CliOptions) => {
+    .action(async (name: string = `react-three-${generateRandomName()}`, options: CliOptions) => {
       let generateOptions: GenerateOptions
 
       if (options.url) {
@@ -215,7 +219,8 @@ async function main() {
           offscreen: options.offscreen ? {} : undefined,
           zustand: options.zustand ? {} : undefined,
           koota: options.koota ? {} : undefined,
-          triplex: options.triplex,
+          viverse: options.viverse ? {} : undefined,
+          triplex: options.triplex ? {} : undefined,
           packageManager: options['package-manager'],
           skipSetup: options['skip-setup'],
         }

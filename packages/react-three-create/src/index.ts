@@ -13,6 +13,7 @@ import { generateXr, GenerateXrOptions } from './integrations/xr.js'
 import { generateZustand, GenerateZustandOptions } from './integrations/zustand.js'
 import { generateTriplex, GenerateTriplexOptions } from './integrations/triplex.js'
 import { merge } from './merge.js'
+import { GenerateViverseOptions } from './integrations/viverse.js'
 
 export * from "./utils.js"
 
@@ -30,6 +31,7 @@ export type GenerateOptions = {
   postprocessing?: GeneratePostprocessingOptions
   rapier?: GenerateRapierOptions
   triplex?: GenerateTriplexOptions
+  viverse?: GenerateViverseOptions
   uikit?: GenerateUikitOptions
   xr?: GenerateXrOptions
   zustand?: GenerateZustandOptions
@@ -126,7 +128,7 @@ export function generate(options: GenerateOptions) {
   let viteConfig = {
     plugins: ['$raw:react()'],
     resolve: { dedupe: ['three'] },
-    base: `/${name}`, //to work with the github pages config
+    base: "./",
   }
 
   const generator: Generator = {
