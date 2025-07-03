@@ -63,6 +63,8 @@ jobs:
 `,
   })
 
+  generator.addDependency('@viverse/cli', '^0.9.5-beta.8')
+
   generator.inject(
     'readme-start',
     `A GitHub CI/CD workflow for publishing to Viverse is configured.
