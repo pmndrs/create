@@ -25,7 +25,7 @@ jobs:
     steps:
       - id: check
         run: |
-          if [ -z "\${{ secrets.VIVERSE_EMAIL != '' && secrets.VIVERSE_PASSWORD != '' }}" ]; then
+          if [[ -n "\${{ secrets.VIVERSE_EMAIL }}" && -n "\${{ secrets.VIVERSE_PASSWORD }}" ]]; then
             echo "secrets-available=true" >> $GITHUB_OUTPUT
           else
             echo "secrets-available=false" >> $GITHUB_OUTPUT
@@ -79,6 +79,6 @@ You can also upload your project manually using the Viverse CLI:
 viverse-cli auth login -e <email> -p <password>
 npm run build
 viverse-cli app publish ./dist --auto-create-app --name ${generator.options.name}
-\`\`\``,
+\`\`\`\n`,
   )
 }

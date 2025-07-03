@@ -58,7 +58,7 @@ jobs:
     const address = `${generator.options.githubUserName}.github.io/${generator.options.githubRepoName}`
     generator.inject(
       'readme-start',
-      `Your app will be publish at [${address}](https://${address}) once the github action is finished.`,
+      `Your app will be publish at [${address}](https://${address}) once the github action is finished.\n`,
     )
   }
 }
