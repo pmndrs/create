@@ -26,9 +26,9 @@ jobs:
       - id: check
         run: |
           if [ -z "\${{ secrets.VIVERSE_EMAIL != '' && secrets.VIVERSE_PASSWORD != '' }}" ]; then
-            echo "secrets-available=false" >> $GITHUB_OUTPUT
-          else
             echo "secrets-available=true" >> $GITHUB_OUTPUT
+          else
+            echo "secrets-available=false" >> $GITHUB_OUTPUT
           fi
 
   build-and-deploy:
