@@ -13,9 +13,9 @@ import { generateXr, GenerateXrOptions } from './integrations/xr.js'
 import { generateZustand, GenerateZustandOptions } from './integrations/zustand.js'
 import { generateTriplex, GenerateTriplexOptions } from './integrations/triplex.js'
 import { merge } from './merge.js'
-import { GenerateViverseOptions } from './integrations/viverse.js'
+import { generateViverse, GenerateViverseOptions } from './integrations/viverse.js'
 
-export * from "./utils.js"
+export * from './utils.js'
 
 export type GenerateOptions = {
   githubUserName?: string
@@ -128,7 +128,7 @@ export function generate(options: GenerateOptions) {
   let viteConfig = {
     plugins: ['$raw:react()'],
     resolve: { dedupe: ['three'] },
-    base: "./",
+    base: './',
   }
 
   const generator: Generator = {
@@ -171,6 +171,7 @@ export function generate(options: GenerateOptions) {
   generateFiber(generator, clonedOptions.fiber)
   generateGithubPages(generator, clonedOptions.githubPages)
   generateTriplex(generator, clonedOptions.triplex)
+  generateViverse(generator, clonedOptions.viverse)
 
   for (const { code, location } of clonedOptions.injections ?? []) {
     generator.inject(location, code)
