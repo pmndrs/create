@@ -51,7 +51,12 @@ export type Recipe = {
 }
 
 export type RecipeEditOperation =
-  | string
+  | Exclude<
+      Json,
+      {
+        [x: string]: Json
+      }
+    >
   | { set?: Json; push?: Json; pushAll?: Array<Json>; append?: string; prepend?: string; description?: string }
 
 export function buildProject(
@@ -79,7 +84,9 @@ export function buildProject(
     resolvedRecipes.splice(insertLocation, 0, recipe)
     return insertLocation
   }
-  recipes.forEach(addRecipe)
+  for (let i = recipes.length - 1; i >= 0; i--) {
+    addRecipe(recipes[i]!)
+  }
   const files: Record<string, Json> = {}
   const variables: Record<string, Json> = {}
   for (const recipe of resolvedRecipes) {
@@ -91,21 +98,19 @@ export function buildProject(
   const resolvedVariables: Record<string, Json> = {}
 
   // Resolve all variables: replace variable references with their values
-  const variableQueue = Object.keys(variables)
+  const variableEntryQueue = Object.entries(variables)
   const resolvedVariableNames = new Set<string>()
 
-  while (variableQueue.length > 0) {
+  while (variableEntryQueue.length > 0) {
     let madeProgress = false
 
-    for (let i = variableQueue.length - 1; i >= 0; i--) {
-      const variableName = variableQueue[i]!
-      const variableValue = variables[variableName]!
-
+    for (let i = variableEntryQueue.length - 1; i >= 0; i--) {
+      const [variableName, variableValue] = variableEntryQueue[i]!
       try {
-        const resolved = resolveVariableReferences(variableValue, resolvedVariables)
+        const resolved = resolveVariableReferences(variableValue, variables, resolvedVariables)
         resolvedVariables[variableName] = resolved
         resolvedVariableNames.add(variableName)
-        variableQueue.splice(i, 1)
+        variableEntryQueue.splice(i, 1)
         madeProgress = true
       } catch (error) {
         if (error instanceof VariableResolutionError) {
@@ -116,15 +121,15 @@ export function buildProject(
       }
     }
 
-    if (!madeProgress && variableQueue.length > 0) {
-      throw new Error(`Circular dependency or missing variables detected for: ${variableQueue.join(', ')}`)
+    if (!madeProgress) {
+      throw new Error(`Circular dependency detected for: ${variableEntryQueue.map(([key]) => key).join(', ')}`)
     }
   }
 
   // Convert files from Record<string, Json> to Record<string, string> and return them
   const result: Record<string, string> = {}
   for (const [fileName, fileValue] of Object.entries(files)) {
-    result[fileName] = jsonToOutputString(resolveVariableReferences(fileValue, resolvedVariables))
+    result[fileName] = jsonToOutputString(resolveVariableReferences(fileValue, variables, resolvedVariables))
   }
   return result
 }
@@ -148,7 +153,7 @@ export function applyRecipeEditOperation(
   path: string,
   operation: string | RecipeEditOperation,
 ): void {
-  if (typeof operation === 'string') {
+  if (Array.isArray(operation) || operation == null || typeof operation != 'object') {
     operation = {
       set: operation,
     }
@@ -160,30 +165,29 @@ export function applyRecipeEditOperation(
     }
   }
   let current = getAtPath(files, variables, path)
-  if (current === undefined) {
-    throw new Error(`unkown value at path "${path}"`)
-  }
   if (operation.append != null) {
     if (typeof current != 'string') {
-      current = jsonToOutputString(current)
+      current = jsonToOutputString(current ?? '')
     }
     setAtPath(files, variables, path, `${current}${operation.append}`)
   }
   if (operation.prepend != null) {
     if (typeof current != 'string') {
-      current = jsonToOutputString(current)
+      current = jsonToOutputString(current ?? '')
     }
     setAtPath(files, variables, path, `${operation.prepend}${current}`)
   }
   if (operation.push != null) {
+    current ??= []
     if (!Array.isArray(current)) {
-      throw new Error(`Cannot push to non-array value at path "${path}"`)
+      throw new Error(`Cannot push to non-array value ${JSON.stringify(current)} at path "${path}"`)
     }
     setAtPath(files, variables, path, [...current, inputJsonToJson(operation.push)])
   }
   if (operation.pushAll != null) {
+    current ??= []
     if (!Array.isArray(current)) {
-      throw new Error(`Cannot pushAll to non-array value at path "${path}"`)
+      throw new Error(`Cannot pushAll to non-array value "${current}" at path "${path}"`)
     }
     setAtPath(files, variables, path, [...current, ...operation.pushAll.map(inputJsonToJson)])
   }
@@ -197,11 +201,9 @@ function setAtPath(files: Record<string, Json>, variables: Record<string, Json>,
     if (object[key] == null) {
       object[key] = isNaN(parseInt(key)) ? {} : []
     }
-    if (Array.isArray(object[key]) && isNaN(parseInt(key))) {
-      throw new Error(`unable to write to array with key "${key}" (full path "${path}")`)
-    }
     object = object[key]
     key = valuePathPart
+    assureAccessible(object, valuePathPart, path)
   }
   object[key] = value
 }
@@ -213,12 +215,19 @@ function getAtPath(files: Record<string, Json>, variables: Record<string, Json>,
     if (value == null) {
       return undefined
     }
-    if (typeof value !== 'object') {
-      return undefined
-    }
+    assureAccessible(value, valuePathPart, path)
     value = value[valuePathPart as never]
   }
   return value
+}
+
+function assureAccessible(object: unknown, key: string, path: string) {
+  if (typeof object !== 'object') {
+    throw new Error(`unable to access path "${path}". Found non-object value "${object}".`)
+  }
+  if (Array.isArray(object) && isNaN(parseInt(key))) {
+    throw new Error(`unable to access array with key "${key}" (full path "${path}")`)
+  }
 }
 
 function parsePath(path: string): { isFile: boolean; name: string; valuePath: Array<string> } {
@@ -244,32 +253,36 @@ function parsePath(path: string): { isFile: boolean; name: string; valuePath: Ar
   }
 }
 
-function resolveVariableReferences(value: Json, resolvedVariables: Record<string, Json>): Json {
+function resolveVariableReferences(
+  value: Json,
+  unresolvedVariables: Record<string, Json>,
+  resolvedVariables: Record<string, Json>,
+): Json {
   if (typeof value === 'string') {
     // Replace variable references like {{ @variableName }} with their resolved values
     return value.replace(/\{\{\s*(@[^}]+)\s*\}\}/g, (match, variableName) => {
       const trimmedVarName = variableName.trim()
-      if (!(trimmedVarName in resolvedVariables)) {
+      const resolvedValue = resolvedVariables[trimmedVarName]
+      if (resolvedValue == null && trimmedVarName in unresolvedVariables) {
         throw new VariableResolutionError(trimmedVarName)
       }
-      const resolvedValue = resolvedVariables[trimmedVarName]!
-      return jsonToOutputString(resolvedValue)
+      return jsonToOutputString(resolvedValue ?? '')
     })
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => resolveVariableReferences(item, resolvedVariables))
+    return value.map((item) => resolveVariableReferences(item, unresolvedVariables, resolvedVariables))
   }
 
-  if (value !== null && typeof value === 'object') {
-    const resolved: Record<string, Json> = {}
-    for (const [key, val] of Object.entries(value)) {
-      resolved[key] = resolveVariableReferences(val, resolvedVariables)
-    }
-    return resolved
+  if (value == null || typeof value != 'object') {
+    return value
   }
 
-  return value
+  const resolved: Record<string, Json> = {}
+  for (const [key, val] of Object.entries(value)) {
+    resolved[key] = resolveVariableReferences(val, unresolvedVariables, resolvedVariables)
+  }
+  return resolved
 }
 
 function inputJsonToJson(input: Json): Json {
