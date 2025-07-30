@@ -38,7 +38,7 @@ async function loadOptionsFromUrl(url: string): Promise<GenerateOptions> {
   }
 }
 
-async function promptForOptions(name: string): Promise<GenerateOptions> {
+async function promptForOptions(name: string | undefined): Promise<GenerateOptions> {
   let cancelled = false
   if (name == null) {
     name = (
@@ -47,7 +47,7 @@ async function promptForOptions(name: string): Promise<GenerateOptions> {
           type: 'text',
           name: 'name',
           message: 'What is your project named?',
-          initial: 'react-three-app',
+          initial: `react-three-${generateRandomName()}`,
           validate: (name: string) => (name.length > 0 ? true : 'Project name is required'),
         },
         {
@@ -133,7 +133,7 @@ async function promptForOptions(name: string): Promise<GenerateOptions> {
   }
 
   return {
-    name,
+    name: name!,
     language: answers.language,
     drei: answers.integrations?.includes('drei') ? {} : undefined,
     handle: answers.integrations?.includes('handle') ? {} : undefined,
@@ -199,15 +199,15 @@ async function main() {
       'Skip automatically installing dependencies, starting the dev server, and opening the browser after project creation',
     )
     .option('-y, --yes', 'Skip prompts and use default values')
-    .action(async (name: string = `react-three-${generateRandomName()}`, options: CliOptions) => {
+    .action(async (name: string | undefined, options: CliOptions) => {
       let generateOptions: GenerateOptions
 
       if (options.url) {
         generateOptions = await loadOptionsFromUrl(options.url)
-        generateOptions.name ??= name
+        generateOptions.name ??= name || `react-three-${generateRandomName()}`
       } else if (Object.keys(options).length > 0) {
         generateOptions = {
-          name,
+          name: name || `react-three-${generateRandomName()}`,
           language: options.js ? 'javascript' : 'typescript',
           drei: options.drei ? {} : undefined,
           handle: options.handle ? {} : undefined,
