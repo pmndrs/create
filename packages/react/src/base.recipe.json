@@ -1,0 +1,195 @@
+{
+  "name": "base",
+  "version": "0.0.0",
+  "edits": {
+    "package.json": {
+      "set": {
+        "name": "{{ @projectName }}",
+        "type": "module",
+        "dependencies": {
+          "three": "~0.175.0",
+          "@react-three/fiber": "^9.0.0",
+          "react-dom": "^19.0.0",
+          "react": "^19.0.0",
+          "vite": "^6.3.4",
+          "@vitejs/plugin-react": "^4.4.1"
+        },
+        "scripts": {
+          "dev": "vite",
+          "build": "vite build"
+        }
+      }
+    },
+    "tsconfig.json": {
+      "set": {
+        "compilerOptions": {
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "bundler",
+          "esModuleInterop": true,
+          "jsx": "react-jsx",
+          "strict": true,
+          "skipLibCheck": true,
+          "outDir": "dist"
+        },
+        "include": ["src/**/*"]
+      }
+    },
+    "package.json/dependencies/@types\\/three": "~0.175.0",
+    "package.json/dependencies/@types\\/react-dom": "^19.0.0",
+    "package.json/dependencies/@types\\/react": "^19.0.0",
+    "vite.config.js": {
+      "lines": [
+        "import { defineConfig } from 'vite'",
+        "import react from '@vitejs/plugin-react'",
+        "{{ @viteConfigImports }}",
+        "",
+        "export default defineConfig({",
+        "  plugins: [react(){{ @vitePlugins }}],",
+        "  resolve: { dedupe: ['three'] },",
+        "  base: './',",
+        "{{ @viteConfig }}",
+        "})"
+      ]
+    },
+    "src/index.tsx": {
+      "lines": [
+        "import { StrictMode } from 'react'",
+        "import { createRoot } from 'react-dom/client'",
+        "import { App } from './app.js'",
+        "",
+        "createRoot(document.getElementById('root')!).render(",
+        "  <StrictMode>",
+        "    <App />",
+        "  </StrictMode>,",
+        ")"
+      ]
+    },
+    "src/app.tsx": {
+      "lines": [
+        "import { Canvas } from \"@react-three/fiber\"",
+        "{{@imports}}",
+        "",
+        "{{@globalStart}}",
+        "",
+        "export function App() {",
+        "  return (",
+        "    <>",
+        "      {{@domStart}}",
+        "      {{@dom}}",
+        "      <Canvas>",
+        "        {{@sceneStart}}",
+        "        {{@scene}}",
+        "        {{@sceneEnd}}",
+        "      </Canvas>",
+        "      {{@domEnd}}",
+        "    </>",
+        "  )",
+        "}",
+        "",
+        "{{@globalEnd}}"
+      ]
+    },
+    "index.html": {
+      "lines": [
+        "<!DOCTYPE html>",
+        "<html lang=\"en\">",
+        "<head>",
+        "    <meta charset=\"UTF-8\">",
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+        "    <title>{{ @projectName }}</title>",
+        "</head>",
+        "<body style=\"margin: 0; overscroll-behavior: none; user-select: none; touch-action: none;\">",
+        "    <script type=\"module\" src=\"./src/index.tsx\"></script>",
+        "    <div style=\"width: 100dvw; height: 100dvh; overflow: hidden;\" id=\"root\"></div>",
+        "</body>",
+        "</html>"
+      ]
+    },
+    "README.md": {
+      "lines": [
+        "# {{ @projectName }}",
+        "",
+        "This project was generated with [react-three.org](https://react-three.org)",
+        "",
+        "{{ @readmeStart }}",
+        "",
+        "## Project Architecture",
+        "",
+        "This project uses [Vite](https://vitejs.dev/) as the bundler for fast development and optimized production builds.",
+        "- `app.tsx` defines the main application component containing your 3D content",
+        "- Modify the content inside the `<Canvas>` component to change what is visible on screen",
+        "- Static assets can be placed in the `public` folder",
+        "",
+        "## Libraries",
+        "",
+        "The following libraries are used - checkout the linked docs to learn more",
+        "- [React](https://react.dev/) - A JavaScript library for building user interfaces",
+        "- [Three.js](https://threejs.org/) - JavaScript 3D library",
+        "- [@react-three/fiber](https://docs.pmnd.rs/react-three-fiber) - lets you create Three.js scenes using React components",
+        "{{ @readmeLibraries }}",
+        "",
+        "{{ @readmeTools }}",
+        "",
+        "{{ @readmeHosting }}",
+        "",
+        "{{ @readmeExtension }}",
+        "",
+        "{{ @readmeExample }}",
+        "",
+        "## Development Commands",
+        "",
+        "- `{{ @packageManager }} install` to install the dependencies",
+        "- `{{ @packageManager }} run dev` to run the development server and preview the app with live updates",
+        "- `{{ @packageManager }} run build` to build the app into the `dist` folder",
+        "{{ @readmeCommands }}",
+        "",
+        "{{ @readmeEnd }}"
+      ]
+    },
+    ".gitignore": {
+      "lines": [
+        "node_modules",
+        "dist"
+      ]
+    },
+    ".gitattributes": {
+      "lines": [
+        "* text eol=lf",
+        "*.png binary",
+        "*.jpg binary",
+        "*.jpeg binary",
+        "*.gif binary",
+        "*.ico binary",
+        "*.mov binary",
+        "*.mp4 binary",
+        "*.mp3 binary",
+        "*.flv binary",
+        "*.fla binary",
+        "*.wav binary",
+        "*.swf binary",
+        "*.gz binary",
+        "*.zip binary",
+        "*.7z binary",
+        "*.ttf binary",
+        "*.eot binary",
+        "*.woff binary",
+        "*.pyc binary",
+        "*.pdf binary",
+        "*.glb binary",
+        "*.gltf binary"
+      ]
+    },
+    ".vscode/extensions.json": {
+      "set": {
+        "recommendations": "{{ @vscodeExtensionSuggestions }}"
+      }
+    },
+    "@projectName": "react-three-app",
+    "@packageManager": "npm",
+    "@vscodeExtensionSuggestions": [],
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/fiber](https://docs.pmnd.rs/react-three-fiber) - React renderer for three.js"]
+    }
+  }
+}

@@ -57,12 +57,31 @@ export type RecipeEditOperation =
         [x: string]: Json
       }
     >
-  | { set?: Json; push?: Json; pushAll?: Array<Json>; append?: string; prepend?: string; description?: string }
+  | {
+      url?: string
+      base64?: string
+      set?: Json
+      lines?: Array<string>
+      push?: Json
+      pushAll?: Array<Json>
+      append?: string
+      appendLines?: Array<string>
+      prepend?: string
+      prependLines?: Array<string>
+      description?: string
+    }
 
-export function buildProject(
+const encoder = new TextEncoder()
+
+export type ChefOptions = {
+  allowUrl?: boolean
+}
+
+export async function buildProject(
   recipes: Array<Recipe>,
   resolveRequirements?: (name: string, versionQuery: string) => Recipe,
-): Record<string, string> {
+  options?: ChefOptions,
+) {
   const resolvedRecipes: Array<Recipe> = []
   const addRecipe = (recipe: Recipe): number => {
     const insertLocation =
@@ -88,12 +107,13 @@ export function buildProject(
     addRecipe(recipes[i]!)
   }
   const files: Record<string, Json> = {}
+  const binaryFiles: Record<string, Uint8Array> = {}
   const variables: Record<string, Json> = {}
   for (const recipe of resolvedRecipes) {
     if (recipe.edits == null) {
       continue
     }
-    applyRecipeEdits(files, variables, recipe.edits)
+    await applyRecipeEdits(files, variables, recipe.edits, binaryFiles, options)
   }
   const resolvedVariables: Record<string, Json> = {}
 
@@ -127,42 +147,82 @@ export function buildProject(
   }
 
   // Convert files from Record<string, Json> to Record<string, string> and return them
-  const result: Record<string, string> = {}
+  const result: Record<string, Uint8Array> = {
+    ...binaryFiles,
+  }
   for (const [fileName, fileValue] of Object.entries(files)) {
-    result[fileName] = jsonToOutputString(resolveVariableReferences(fileValue, variables, resolvedVariables))
+    result[fileName] = encoder.encode(
+      jsonToOutputString(resolveVariableReferences(fileValue, variables, resolvedVariables)),
+    )
   }
   return result
 }
 
-export function applyRecipeEdits(
+export async function applyRecipeEdits(
   files: Record<string, Json>,
   variables: Record<string, Json>,
   edits: Exclude<Recipe['edits'], undefined>,
-): void {
+  binaryFiles?: Record<string, Uint8Array>,
+  options?: ChefOptions,
+) {
   if (edits == null) {
     return
   }
   for (const [path, operation] of Object.entries(edits)) {
-    applyRecipeEditOperation(files, variables, path, operation)
+    await applyRecipeEditOperation(files, variables, path, operation, binaryFiles, options)
   }
 }
 
-export function applyRecipeEditOperation(
+export async function applyRecipeEditOperation(
   files: Record<string, Json>,
   variables: Record<string, Json>,
   path: string,
   operation: string | RecipeEditOperation,
-): void {
+  binaryFiles?: Record<string, Uint8Array>,
+  options?: ChefOptions,
+) {
   if (Array.isArray(operation) || operation == null || typeof operation != 'object') {
     operation = {
       set: operation,
     }
   }
+  if (operation.url != null) {
+    if (!options?.allowUrl) {
+      throw new Error(`URL operator is not enabled. Set 'allowUrl: true' in ChefOptions to enable URL fetching.`)
+    }
+    const response = await fetch(operation.url)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch URL "${operation.url}": ${response.status} ${response.statusText}`)
+    }
+    const contentType = response.headers.get('content-type') || ''
+    if (contentType.startsWith('text/') || contentType.includes('json') || contentType.includes('javascript') || contentType.includes('xml')) {
+      const textContent = await response.text()
+      setAtPath(files, variables, path, textContent)
+    } else {
+      if (binaryFiles == null) {
+        throw new Error(`binaryFiles parameter is required when fetching binary content from URL`)
+      }
+      const binaryContent = new Uint8Array(await response.arrayBuffer())
+      const { name } = parsePath(path)
+      binaryFiles[name] = binaryContent
+    }
+  }
+  if (operation.base64 != null) {
+    const binaryData = Uint8Array.from(atob(operation.base64), (c) => c.charCodeAt(0))
+    if (path.startsWith('@')) {
+      throw new Error(`Cannot set base64 data on variable "${path}". Use file paths for binary data.`)
+    }
+    if (binaryFiles == null) {
+      throw new Error(`binaryFiles parameter is required when using base64 operations`)
+    }
+    const { name } = parsePath(path)
+    binaryFiles[name] = binaryData
+  }
+  if (operation.lines != null) {
+    setAtPath(files, variables, path, operation.lines.join('\n'))
+  }
   if (operation.set != null) {
     setAtPath(files, variables, path, inputJsonToJson(operation.set))
-    if (Object.keys(operation).length === 1) {
-      return
-    }
   }
   let current = getAtPath(files, variables, path)
   if (operation.append != null) {
@@ -171,11 +231,25 @@ export function applyRecipeEditOperation(
     }
     setAtPath(files, variables, path, `${current}${operation.append}`)
   }
+  if (operation.appendLines != null) {
+    if (typeof current != 'string') {
+      current = jsonToOutputString(current ?? '')
+    }
+    const appendText = operation.appendLines.join('\n')
+    setAtPath(files, variables, path, current.length > 0 ? `${current}\n${appendText}` : appendText)
+  }
   if (operation.prepend != null) {
     if (typeof current != 'string') {
       current = jsonToOutputString(current ?? '')
     }
     setAtPath(files, variables, path, `${operation.prepend}${current}`)
+  }
+  if (operation.prependLines != null) {
+    if (typeof current != 'string') {
+      current = jsonToOutputString(current ?? '')
+    }
+    const prependText = operation.prependLines.join('\n')
+    setAtPath(files, variables, path, current.length > 0 ? `${prependText}\n${current}` : prependText)
   }
   if (operation.push != null) {
     current ??= []
@@ -248,8 +322,9 @@ function parsePath(path: string): { isFile: boolean; name: string; valuePath: Ar
     name: path.slice(0, endOfNameIndex),
     valuePath: path
       .slice(endOfNameIndex + 1)
-      .split('/')
-      .filter((part) => part.length > 0),
+      .split(/(?<!\\)\//)
+      .filter((part) => part.length > 0)
+      .map((part) => part.replaceAll(/(?<!\\)\\\//g, '/')),
   }
 }
 
@@ -260,7 +335,7 @@ function resolveVariableReferences(
 ): Json {
   if (typeof value === 'string') {
     // Replace variable references like {{ @variableName }} with their resolved values
-    return value.replace(/\{\{\s*(@[^}]+)\s*\}\}/g, (match, variableName) => {
+    return value.replace(/\{\{\s*(@[^}]+)\s*\}\}/g, (_, variableName) => {
       const trimmedVarName = variableName.trim()
       const resolvedValue = resolvedVariables[trimmedVarName]
       if (resolvedValue == null && trimmedVarName in unresolvedVariables) {

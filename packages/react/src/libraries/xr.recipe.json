@@ -1,0 +1,65 @@
+{
+  "name": "xr",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/@react-three\\/xr": "^6.6.16",
+    "package.json/dependencies/@vitejs\\/plugin-basic-ssl": "^2.0.0",
+    "@imports": {
+      "appendLines": ["import { XR, createXRStore } from '@react-three/xr'"]
+    },
+    "@globalStart": {
+      "appendLines": ["const store = createXRStore({})"]
+    },
+    "@sceneStart": {
+      "prepend": "<XR store={store}>"
+    },
+    "@sceneEnd": {
+      "append": "</XR>"
+    },
+    "@viteConfigImports": {
+      "appendLines": ["import basicSsl from '@vitejs/plugin-basic-ssl'"]
+    },
+    "@vitePlugins": {
+      "append": ", basicSsl()"
+    },
+    "@viteConfig": {
+      "appendLines": ["  server: {", "    host: true,", "  },"]
+    },
+    "@domStart": {
+      "appendLines": [
+        "<div style={{",
+        "        display: \"flex\",",
+        "          flexDirection: \"row\",",
+        "          gap: \"1rem\",",
+        "          position: 'absolute',",
+        "          zIndex: 10000,",
+        "          background: 'black',",
+        "          borderRadius: '0.5rem',",
+        "          border: 'none',",
+        "          fontWeight: 'bold',",
+        "          color: 'white',",
+        "          cursor: 'pointer',",
+        "          fontSize: '1.5rem',",
+        "          bottom: '1rem',",
+        "          left: '50%',",
+        "          boxShadow: '0px 0px 20px rgba(0,0,0,1)',",
+        "          transform: 'translate(-50%, 0)',",
+        "        }}><button",
+        "        style={{ cursor: \"pointer\", padding: '1rem 2rem', fontSize: \"1rem\", background: \"none\", color: \"white\", border: \"none\" }}",
+        "        onClick={() => store.enterAR()}",
+        "      >",
+        "        Enter AR",
+        "      </button>",
+        "      <button",
+        "        style={{ cursor: \"pointer\", padding: '1rem 2rem', fontSize: \"1rem\", background: \"none\", color: \"white\", border: \"none\" }}",
+        "        onClick={() => store.enterVR()}",
+        "      >",
+        "        Enter VR",
+        "      </button></div>"
+      ]
+    },
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/xr](https://pmndrs.github.io/xr/docs/) - VR/AR support for @react-three/fiber"]
+    }
+  }
+}

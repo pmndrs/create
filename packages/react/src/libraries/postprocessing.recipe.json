@@ -1,0 +1,10 @@
+{
+  "name": "postprocessing",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/@react-three\\/postprocessing": "^3.0.4",
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/postprocessing](https://react-postprocessing.docs.pmnd.rs/) - Post-processing effects for @react-three/fiber"]
+    }
+  }
+}

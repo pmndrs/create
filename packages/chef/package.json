@@ -1,9 +1,13 @@
 {
   "name": "@pmndrs/chef",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Chef takes recipes and cooks your projects.",
   "main": "src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
   "scripts": {
+    "build": "tsc",
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui"

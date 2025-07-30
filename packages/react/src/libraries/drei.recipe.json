@@ -1,0 +1,16 @@
+{
+  "name": "drei",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/@react-three\\/drei": "^10.0.0",
+    "@imports": {
+      "appendLines": ["import { Environment } from \"@react-three/drei\""]
+    },
+    "@scene": {
+      "appendLines": ["<Environment background preset=\"city\" />"]
+    },
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/drei](https://drei.docs.pmnd.rs/) - Useful helpers for @react-three/fiber"]
+    }
+  }
+}

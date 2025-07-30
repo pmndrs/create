@@ -1,0 +1,10 @@
+{
+  "name": "leva",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/leva": "^0.10.0",
+    "@readmeLibraries": {
+      "appendLines": ["[leva](https://github.com/pmndrs/leva) - HTML GUI panel for React with lightweight, beautiful and extensible controls"]
+    }
+  }
+}

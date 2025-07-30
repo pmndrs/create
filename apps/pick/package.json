@@ -16,8 +16,5 @@
     "build": "tsc",
     "dev": "dotenvx run -f .env -- node --watch --loader ts-node/esm src/index.ts",
     "start": "node dist/index.js"
-  },
-  "devDependencies": {
-    "@types/node": "^20.17.32"
   }
 }

@@ -1,0 +1,26 @@
+{
+  "name": "@pmndrs/vite-chef",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@pmndrs/chef": "workspace:^"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^6.3.4"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0 || ^6.0.0"
+  }
+}

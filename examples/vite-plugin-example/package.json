@@ -1,0 +1,17 @@
+{
+  "name": "vite-plugin-example",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsx build-example.ts"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.4",
+    "tsx": "^4.19.2",
+    "@pmndrs/vite-chef": "workspace:^",
+    "@pmndrs/vite-esmsh": "workspace:^",
+    "@react-three/create": "workspace:^"
+  }
+}

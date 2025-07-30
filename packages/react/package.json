@@ -1,0 +1,37 @@
+{
+  "name": "@react-three/create",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project ./tsconfig.build.json",
+    "dev": "node --loader ts-node/esm src/cli.ts",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": "dist/cli.js",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "inquirer": "^9.3.7",
+    "open": "^10.1.2",
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2",
+    "semver": "^7.7.1",
+    "undici": "^5.28.4",
+    "@pmndrs/chef": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/prompts": "^2.4.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "vitest": "^2.0.0"
+  }
+}

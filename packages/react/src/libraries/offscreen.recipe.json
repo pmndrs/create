@@ -1,0 +1,10 @@
+{
+  "name": "offscreen",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/@react-three\\/offscreen": "^0.0.8",
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/offscreen](https://github.com/pmndrs/offscreen) - Offload your scene to a worker thread for better performance"]
+    }
+  }
+}

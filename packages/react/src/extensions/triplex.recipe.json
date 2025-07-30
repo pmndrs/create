@@ -1,0 +1,74 @@
+{
+  "name": "triplex",
+  "version": "0.0.0",
+  "edits": {
+    "@vscodeExtensionSuggestions": {
+      "appendLines": ["trytriplex.triplex-vsce"]
+    },
+    "@readmeExtension": {
+      "appendLines": [
+        "## Extensions",
+        "",
+        "[Triplex](https://triplex.dev) - Your visual workspace for React / Three Fiber. Get started by installing [Triplex for VS Code](https://triplex.dev/docs/get-started/vscode). Don't use Visual Studio Code? Download [Triplex Standalone](https://triplex.dev/docs/get-started/standalone)."
+      ]
+    },
+    ".triplex/providers.tsx": {
+      "lines": [
+        "import { type ReactNode, useLayoutEffect } from \"react\";",
+        "import { setPreferredColorScheme } from \"@react-three/uikit\";",
+        "import { Physics } from \"@react-three/rapier\";",
+        "import { Bloom, DepthOfField, EffectComposer } from \"@react-three/postprocessing\";",
+        "",
+        "/**",
+        " * The global provider is rendered at the root of your application,",
+        " * use it to set up global configuration like themes.",
+        " * Props defined on this component appear as controls inside Triplex.",
+        " *",
+        " * See: https://triplex.dev/docs/building-your-scene/providers#global-provider",
+        " */",
+        "export function GlobalProvider({ children, colorMode = \"light\" }: { children: ReactNode; colorMode?: \"light\" | \"dark\" }) {",
+        "  useLayoutEffect(() => {",
+        "    setPreferredColorScheme(colorMode);",
+        "  }, [colorMode]);",
+        "  return (",
+        "    <>",
+        "      {children}",
+        "    </>",
+        "  );",
+        "}",
+        "",
+        "/**",
+        " * The canvas provider is rendered as a child inside the React Three Fiber canvas,",
+        " * use it to set up canvas specific configuration like post-processing and physics.",
+        " * Props defined on this component appear as controls inside Triplex.",
+        " *",
+        " * See: https://triplex.dev/docs/building-your-scene/providers#canvas-provider",
+        " */",
+        "export function CanvasProvider({ children, physicsEnabled = false, debugPhysics = true, postProcessingEnabled = true }: { children: ReactNode; physicsEnabled?: boolean; debugPhysics?: boolean; postProcessingEnabled?: boolean }) {",
+        "  return (",
+        "    <>",
+        "      <EffectComposer enabled={postProcessingEnabled}>",
+        "        <DepthOfField",
+        "          focusDistance={0}",
+        "          focalLength={0.02}",
+        "          bokehScale={2}",
+        "          height={480}",
+        "        />",
+        "        <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />",
+        "      </EffectComposer>",
+        "      <Physics paused={!physicsEnabled} debug={debugPhysics}>{children}</Physics>",
+        "    </>",
+        "  );",
+        "}"
+      ]
+    },
+    ".triplex/config.json": {
+      "lines": [
+        "{",
+        "  \"$schema\": \"https://triplex.dev/config.schema.json\",",
+        "  \"provider\": \"./providers.tsx\"",
+        "}"
+      ]
+    }
+  }
+}

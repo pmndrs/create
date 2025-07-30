@@ -1,0 +1,10 @@
+{
+  "name": "koota",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/koota": "^0.4.0",
+    "@readmeLibraries": {
+      "appendLines": ["[koota](https://github.com/pmndrs/koota) - ECS-based state management library optimized for real-time apps, games, and XR experiences"]
+    }
+  }
+}

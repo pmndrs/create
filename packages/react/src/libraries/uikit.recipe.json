@@ -1,0 +1,10 @@
+{
+  "name": "uikit",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/@react-three\\/uikit": "^0.8.15",
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/uikit](https://pmndrs.github.io/uikit/docs/) - UI primitives for React Three Fiber"]
+    }
+  }
+}

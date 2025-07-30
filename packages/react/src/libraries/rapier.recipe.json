@@ -1,0 +1,10 @@
+{
+  "name": "rapier",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/@react-three\\/rapier": "^2.1.0",
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/rapier](https://github.com/pmndrs/react-three-rapier) - Physics based on Rapier for your @react-three/fiber scene"]
+    }
+  }
+}

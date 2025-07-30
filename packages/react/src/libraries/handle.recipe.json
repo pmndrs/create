@@ -1,0 +1,10 @@
+{
+  "name": "handle",
+  "version": "0.0.0",
+  "edits": {
+    "package.json/dependencies/@react-three\\/handle": "^6.6.16",
+    "@readmeLibraries": {
+      "appendLines": ["[@react-three/handle](https://pmndrs.github.io/xr/docs/handles/introduction) - interactive controls and handles for your 3D objects"]
+    }
+  }
+}
