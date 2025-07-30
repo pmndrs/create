@@ -6,6 +6,24 @@
   "publishConfig": {
     "main": "dist/index.js"
   },
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://github.com/pmndrs/create",
+  "author": "Bela Bohlender",
+  "keywords": [
+    "projects",
+    "template",
+    "three.js",
+    "react",
+    "r3f"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:pmndrs/create.git"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest --run",
