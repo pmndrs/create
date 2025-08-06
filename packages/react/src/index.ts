@@ -43,24 +43,24 @@ export type GenerateOptions = {
 
 // Recipe map for easy lookup
 const recipes: Record<string, Recipe> = {
-  'base': baseRecipe as Recipe,
-  'drei': dreiRecipe as Recipe,
-  'handle': handleRecipe as Recipe,
-  'koota': kootaRecipe as Recipe,
-  'leva': levaRecipe as Recipe,
-  'offscreen': offscreenRecipe as Recipe,
-  'postprocessing': postprocessingRecipe as Recipe,
-  'rapier': rapierRecipe as Recipe,
-  'uikit': uikitRecipe as Recipe,
-  'xr': xrRecipe as Recipe,
-  'zustand': zustandRecipe as Recipe,
+  base: baseRecipe as Recipe,
+  drei: dreiRecipe as Recipe,
+  handle: handleRecipe as Recipe,
+  koota: kootaRecipe as Recipe,
+  leva: levaRecipe as Recipe,
+  offscreen: offscreenRecipe as Recipe,
+  postprocessing: postprocessingRecipe as Recipe,
+  rapier: rapierRecipe as Recipe,
+  uikit: uikitRecipe as Recipe,
+  xr: xrRecipe as Recipe,
+  zustand: zustandRecipe as Recipe,
   'github-pages': githubPagesRecipe as Recipe,
-  'viverse': viverseRecipe as Recipe,
-  'triplex': triplexRecipe as Recipe,
+  viverse: viverseRecipe as Recipe,
+  triplex: triplexRecipe as Recipe,
   'spinning-boxes': spinningBoxesRecipe as Recipe,
 }
 
-export function loadRecipe(name: string): Recipe {
+export async function loadRecipe(name: string): Promise<Recipe> {
   const recipe = recipes[name]
   if (!recipe) {
     throw new Error(`Recipe "${name}" not found`)
@@ -95,11 +95,6 @@ export function generate(options: GenerateOptions) {
     },
   }
 
-  // Resolver function that loads recipes from the recipes directory
-  const resolveRequirements = (name: string, _versionQuery: string): Recipe => {
-    return loadRecipe(name)
-  }
-
   // Use chef's buildProject to process all recipes
-  return buildProject([mainRecipe], resolveRequirements)
+  return buildProject([mainRecipe], loadRecipe)
 }

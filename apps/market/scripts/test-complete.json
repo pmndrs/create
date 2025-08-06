@@ -1,0 +1,90 @@
+{
+  "name": "complete-test-recipe",
+  "description": "A complete test recipe with all fields",
+  "version": "1.0.0",
+  "requirements": {
+    "test-mesh-component": "^1.0.0",
+    "fancy-button": "~1.1.0"
+  },
+  "tags": ["test", "complete", "example"],
+  "customField": "This should be preserved",
+  "metadata": {
+    "author": "Test Author",
+    "license": "MIT"
+  },
+  "edits": {
+    "CompleteTest.tsx": {
+      "imports": {
+        "react": ["useState", "useEffect"],
+        "@react-three/fiber": ["Canvas", "useFrame"],
+        "@react-three/drei": ["Box", "Sphere", "OrbitControls"]
+      },
+      "components": {
+        "CompleteTest": {
+          "type": "function",
+          "exports": "default",
+          "props": {
+            "size": "number",
+            "color": "string"
+          },
+          "children": [
+            {
+              "type": "Canvas",
+              "props": {
+                "camera": {
+                  "position": [0, 0, 10],
+                  "fov": 75
+                }
+              },
+              "children": [
+                {
+                  "type": "ambientLight",
+                  "props": { "intensity": 0.5 }
+                },
+                {
+                  "type": "Box",
+                  "props": {
+                    "args": ["{{size}}", "{{size}}", "{{size}}"],
+                    "position": [-2, 0, 0]
+                  },
+                  "children": [
+                    {
+                      "type": "meshStandardMaterial",
+                      "props": { "color": "{{color}}" }
+                    }
+                  ]
+                },
+                {
+                  "type": "Sphere",
+                  "props": {
+                    "args": ["{{size / 2}}"],
+                    "position": [2, 0, 0]
+                  },
+                  "children": [
+                    {
+                      "type": "meshStandardMaterial",
+                      "props": {
+                        "color": "{{color}}",
+                        "metalness": 0.8,
+                        "roughness": 0.1
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "OrbitControls"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "utils.ts": {
+      "exports": {
+        "calculateSize": "function",
+        "DEFAULT_COLOR": "string"
+      }
+    }
+  }
+}

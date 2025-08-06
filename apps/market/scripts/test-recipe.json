@@ -1,0 +1,49 @@
+{
+  "name": "test-mesh-component",
+  "description": "A test mesh component for validation",
+  "version": "1.0.2",
+  "edits": {
+    "App.tsx": {
+      "imports": {
+        "react": "React",
+        "@react-three/fiber": ["Canvas"],
+        "@react-three/drei": ["Box", "OrbitControls"]
+      },
+      "components": {
+        "App": {
+          "type": "function",
+          "props": {},
+          "children": [
+            {
+              "type": "Canvas",
+              "props": { "camera": { "position": [0, 0, 5] } },
+              "children": [
+                {
+                  "type": "ambientLight",
+                  "props": { "intensity": 0.5 }
+                },
+                {
+                  "type": "pointLight",
+                  "props": { "position": [10, 10, 10] }
+                },
+                {
+                  "type": "Box",
+                  "props": { "position": [0, 0, 0] },
+                  "children": [
+                    {
+                      "type": "meshStandardMaterial",
+                      "props": { "color": "hotpink" }
+                    }
+                  ]
+                },
+                {
+                  "type": "OrbitControls"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "fancy-button",
+  "description": "A fancy 3D button component",
+  "version": "1.2.0",
+  "requirements": {
+    "test-mesh-component": "^1.0.0"
+  },
+  "edits": {
+    "FancyButton.tsx": {
+      "imports": {
+        "react": ["useState"],
+        "@react-three/fiber": ["useFrame"],
+        "@react-three/drei": ["RoundedBox", "Text"]
+      },
+      "components": {
+        "FancyButton": {
+          "type": "function",
+          "props": {
+            "onClick": "function",
+            "children": "ReactNode"
+          },
+          "exports": "default",
+          "children": [
+            {
+              "type": "group",
+              "props": { "onClick": "{{onClick}}" },
+              "children": [
+                {
+                  "type": "RoundedBox",
+                  "props": { 
+                    "args": [2, 0.5, 0.2],
+                    "radius": 0.05,
+                    "smoothness": 4
+                  },
+                  "children": [
+                    {
+                      "type": "meshStandardMaterial",
+                      "props": { 
+                        "color": "#4f46e5",
+                        "metalness": 0.5,
+                        "roughness": 0.2
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "props": {
+                    "position": [0, 0, 0.11],
+                    "fontSize": 0.2,
+                    "color": "white",
+                    "anchorX": "center",
+                    "anchorY": "middle"
+                  },
+                  "children": "{{children}}"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

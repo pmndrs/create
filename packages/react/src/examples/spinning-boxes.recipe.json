@@ -1,6 +1,9 @@
 {
   "name": "spinning-boxes",
   "version": "0.0.0",
+  "requirements": {
+    "base": "^0.0.0"
+  },
   "edits": {
     "@imports": {
       "appendLines": ["import { Box } from \"./box.js\""]

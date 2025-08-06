@@ -11,6 +11,7 @@ export class VariableResolutionError extends Error {
 
 export type Recipe = {
   name?: string
+  description?: string
   /**
    * @default "0.0.0"
    */
@@ -77,34 +78,48 @@ export type ChefOptions = {
   allowUrl?: boolean
 }
 
+export async function resolveRequirements(name: string, versionQuery: string, onlyApproved = true): Promise<Recipe> {
+  const url = new URL(`${name}/${versionQuery}`, 'http://localhost:3000/api/recipe/')
+  if (!onlyApproved) {
+    url.searchParams.set('includeUnapproved', 'true')
+  }
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Error while resolve requirements "${name}" with version ${versionQuery}: ${response.statusText}`)
+  }
+  return await response.json()
+}
+
 export async function buildProject(
   recipes: Array<Recipe>,
-  resolveRequirements?: (name: string, versionQuery: string) => Recipe,
+  resolveRequirements?: (name: string, versionQuery: string) => Promise<Recipe>,
   options?: ChefOptions,
 ) {
   const resolvedRecipes: Array<Recipe> = []
-  const addRecipe = (recipe: Recipe): number => {
+  const addRecipe = async (recipe: Recipe): Promise<number> => {
     const insertLocation =
       Math.max(
         -1,
-        ...Object.entries(recipe.requirements ?? {}).map(([name, versionQuery]) => {
-          const index = resolvedRecipes.findIndex(
-            (recipe) => recipe.name === name && semver.satisfies(recipe.version ?? '0.0.0', versionQuery),
-          )
-          if (index != -1) {
-            return index
-          }
-          if (resolveRequirements == null) {
-            throw new Error(`Recipe "${name}" requires a resolveRequirements function to resolve dependencies`)
-          }
-          return addRecipe(resolveRequirements(name, versionQuery))
-        }),
+        ...(await Promise.all(
+          Object.entries(recipe.requirements ?? {}).map(async ([name, versionQuery]) => {
+            const index = resolvedRecipes.findIndex(
+              (recipe) => recipe.name === name && semver.satisfies(recipe.version ?? '0.0.0', versionQuery),
+            )
+            if (index != -1) {
+              return index
+            }
+            if (resolveRequirements == null) {
+              throw new Error(`Recipe "${name}" requires a resolveRequirements function to resolve dependencies`)
+            }
+            return addRecipe(await resolveRequirements(name, versionQuery))
+          }),
+        )),
       ) + 1
     resolvedRecipes.splice(insertLocation, 0, recipe)
     return insertLocation
   }
   for (let i = recipes.length - 1; i >= 0; i--) {
-    addRecipe(recipes[i]!)
+    await addRecipe(recipes[i]!)
   }
   const files: Record<string, Json> = {}
   const binaryFiles: Record<string, Uint8Array> = {}
@@ -195,7 +210,12 @@ export async function applyRecipeEditOperation(
       throw new Error(`Failed to fetch URL "${operation.url}": ${response.status} ${response.statusText}`)
     }
     const contentType = response.headers.get('content-type') || ''
-    if (contentType.startsWith('text/') || contentType.includes('json') || contentType.includes('javascript') || contentType.includes('xml')) {
+    if (
+      contentType.startsWith('text/') ||
+      contentType.includes('json') ||
+      contentType.includes('javascript') ||
+      contentType.includes('xml')
+    ) {
       const textContent = await response.text()
       setAtPath(files, variables, path, textContent)
     } else {
@@ -310,7 +330,7 @@ function parsePath(path: string): { isFile: boolean; name: string; valuePath: Ar
   if (isFile) {
     searchStartIndex = path.indexOf('.')
     if (searchStartIndex === -1) {
-      throw new Error(`files must include a "." for the file extension`)
+      throw new Error(`files must include a "." for the file extension but missing in "${path}"`)
     }
   }
   let endOfNameIndex = path.indexOf('/', searchStartIndex)

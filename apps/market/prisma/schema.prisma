@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  emailVerified Boolean  @default(false)
+  image         String?
+  isAdmin       Boolean  @default(false)
+  apiKey        String   @unique @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  recipes  Recipe[]
+  sessions Session[]
+  accounts Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                      String    @id @default(cuid())
+  userId                  String
+  accountId               String
+  providerId              String
+  accessToken             String?
+  refreshToken            String?
+  accessTokenExpiresAt    DateTime?
+  refreshTokenExpiresAt   DateTime?
+  scope                   String?
+  idToken                 String?
+  password                String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+enum RecipeType {
+  ARTIFACT
+  EXAMPLE
+}
+
+model Recipe {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  type        RecipeType
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  userId      String
+
+  // Relations
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions      RecipeVersion[]
+  tags          RecipeTag[]
+  dependentVersions RecipeVersionRequirement[] @relation("RequiredRecipe")
+
+  // Unique constraint: name + type must be unique
+  @@unique([name])
+  @@map("recipes")
+}
+
+model RecipeVersion {
+  id          String   @id @default(cuid())
+  version     String   // semver format
+  recipeId    String
+  edits       Json     // Recipe edits/modifications only
+  approved    Boolean  @default(false)
+  buildError  String?  // Build error message if failed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  requirements RecipeVersionRequirement[]
+
+  @@unique([recipeId, version])
+  @@map("recipe_versions")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  recipes RecipeTag[]
+
+  @@map("tags")
+}
+
+model RecipeTag {
+  recipeId String
+  tagId    String
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, tagId])
+  @@map("recipe_tags")
+}
+
+model RecipeVersionRequirement {
+  id                String @id @default(cuid())
+  versionId         String // The recipe version that has the requirement
+  requiredRecipeId  String // The recipe that is required
+  versionRange      String // semver range like "^1.0.0"
+
+  // Relations
+  version        RecipeVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  requiredRecipe Recipe        @relation("RequiredRecipe", fields: [requiredRecipeId], references: [id], onDelete: Cascade)
+
+  @@unique([versionId, requiredRecipeId])
+  @@map("recipe_version_requirements")
+}

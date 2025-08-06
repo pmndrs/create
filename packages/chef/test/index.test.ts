@@ -199,7 +199,7 @@ describe('@pmndrs/create', () => {
         },
       }
 
-      const resolveRequirements = (name: string, _versionQuery: string): Recipe => {
+      const resolveRequirements = async (name: string, _versionQuery: string): Promise<Recipe> => {
         if (name === 'base-config') {
           return baseRecipe
         }
@@ -239,7 +239,9 @@ describe('Error handling', () => {
       },
     }
 
-    await expect(async () => await buildProject([recipe])).rejects.toThrow('Circular dependency detected for: @varA, @varB, @varC')
+    await expect(async () => await buildProject([recipe])).rejects.toThrow(
+      'Circular dependency detected for: @varA, @varB, @varC',
+    )
   })
 
   it('should throw error for self-referencing variable', async () => {
@@ -283,7 +285,9 @@ describe('Error handling', () => {
       },
     ]
 
-    await expect(async () => await buildProject(recipes)).rejects.toThrow('Cannot push to non-array value "I am a string" at path "@stringVar"')
+    await expect(async () => await buildProject(recipes)).rejects.toThrow(
+      'Cannot push to non-array value "I am a string" at path "@stringVar"',
+    )
   })
 
   it('should throw error when pushing to object variable', async () => {
@@ -302,7 +306,9 @@ describe('Error handling', () => {
       },
     ]
 
-    await expect(async () => await buildProject(recipes)).rejects.toThrow('Cannot push to non-array value {"key":"value"} at path "@objectVar"')
+    await expect(async () => await buildProject(recipes)).rejects.toThrow(
+      'Cannot push to non-array value {"key":"value"} at path "@objectVar"',
+    )
   })
 
   it('should throw error when pushAll to non-array variable', async () => {
@@ -321,7 +327,9 @@ describe('Error handling', () => {
       },
     ]
 
-    await expect(async () => await buildProject(recipes)).rejects.toThrow('Cannot pushAll to non-array value "42" at path "@numberVar"')
+    await expect(async () => await buildProject(recipes)).rejects.toThrow(
+      'Cannot pushAll to non-array value "42" at path "@numberVar"',
+    )
   })
 
   it('should throw writing to subpaths of non-object variables', async () => {
@@ -394,7 +402,9 @@ describe('Error handling', () => {
       },
     }
 
-    await expect(async () => await buildProject([recipe])).rejects.toThrow('Circular dependency detected for: @a, @b, @c, @d, @e')
+    await expect(async () => await buildProject([recipe])).rejects.toThrow(
+      'Circular dependency detected for: @a, @b, @c, @d, @e',
+    )
   })
 
   it('should handle requirement resolution errors', async () => {
@@ -424,11 +434,13 @@ describe('Error handling', () => {
       },
     }
 
-    const resolveRequirements = (name: string, _versionQuery: string): Recipe => {
+    const resolveRequirements = async (name: string, _versionQuery: string): Promise<Recipe> => {
       throw new Error(`Recipe not found: ${name}`)
     }
 
-    await expect(async () => await buildProject([recipe], resolveRequirements)).rejects.toThrow('Recipe not found: unknown-recipe')
+    await expect(async () => await buildProject([recipe], resolveRequirements)).rejects.toThrow(
+      'Recipe not found: unknown-recipe',
+    )
   })
 
   it('should handle variable references in nested object structures', async () => {
@@ -753,11 +765,11 @@ describe('New Operations', () => {
 describe('URL Operations', () => {
   // Mock fetch for testing
   const mockFetch = vi.fn()
-  
+
   beforeEach(() => {
     vi.stubGlobal('fetch', mockFetch)
   })
-  
+
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -774,7 +786,7 @@ describe('URL Operations', () => {
       }
 
       await expect(async () => await buildProject([recipe])).rejects.toThrow(
-        `URL operator is not enabled. Set 'allowUrl: true' in ChefOptions to enable URL fetching.`
+        `URL operator is not enabled. Set 'allowUrl: true' in ChefOptions to enable URL fetching.`,
       )
     })
 
@@ -791,7 +803,7 @@ describe('URL Operations', () => {
       const options: ChefOptions = { allowUrl: false }
 
       await expect(async () => await buildProject([recipe], undefined, options)).rejects.toThrow(
-        `URL operator is not enabled. Set 'allowUrl: true' in ChefOptions to enable URL fetching.`
+        `URL operator is not enabled. Set 'allowUrl: true' in ChefOptions to enable URL fetching.`,
       )
     })
   })
@@ -803,7 +815,7 @@ describe('URL Operations', () => {
         status: 200,
         statusText: 'OK',
         headers: {
-          get: (name: string) => name === 'content-type' ? 'text/plain' : null,
+          get: (name: string) => (name === 'content-type' ? 'text/plain' : null),
         },
         text: () => Promise.resolve('Hello from URL!'),
       })
@@ -831,7 +843,7 @@ describe('URL Operations', () => {
         status: 200,
         statusText: 'OK',
         headers: {
-          get: (name: string) => name === 'content-type' ? 'application/json' : null,
+          get: (name: string) => (name === 'content-type' ? 'application/json' : null),
         },
         text: () => Promise.resolve(JSON.stringify(jsonData)),
       })
@@ -853,13 +865,13 @@ describe('URL Operations', () => {
     })
 
     it('should fetch binary content from URL', async () => {
-      const binaryData = new Uint8Array([0x89, 0x50, 0x4E, 0x47]) // PNG header
+      const binaryData = new Uint8Array([0x89, 0x50, 0x4e, 0x47]) // PNG header
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         statusText: 'OK',
         headers: {
-          get: (name: string) => name === 'content-type' ? 'image/png' : null,
+          get: (name: string) => (name === 'content-type' ? 'image/png' : null),
         },
         arrayBuffer: () => Promise.resolve(binaryData.buffer),
       })
@@ -878,7 +890,7 @@ describe('URL Operations', () => {
 
       expect(mockFetch).toHaveBeenCalledWith('https://example.com/image.png')
       expect(result['image.png']).toBeInstanceOf(Uint8Array)
-      expect(Array.from(result['image.png']!)).toEqual([0x89, 0x50, 0x4E, 0x47])
+      expect(Array.from(result['image.png']!)).toEqual([0x89, 0x50, 0x4e, 0x47])
     })
 
     it('should handle various text-based content types', async () => {
@@ -897,7 +909,7 @@ describe('URL Operations', () => {
           status: 200,
           statusText: 'OK',
           headers: {
-            get: (name: string) => name === 'content-type' ? contentType : null,
+            get: (name: string) => (name === 'content-type' ? contentType : null),
           },
           text: () => Promise.resolve(content),
         })
@@ -937,7 +949,7 @@ describe('URL Operations', () => {
       const options: ChefOptions = { allowUrl: true }
 
       await expect(async () => await buildProject([recipe], undefined, options)).rejects.toThrow(
-        'Failed to fetch URL "https://example.com/missing.txt": 404 Not Found'
+        'Failed to fetch URL "https://example.com/missing.txt": 404 Not Found',
       )
     })
 
@@ -960,7 +972,7 @@ describe('URL Operations', () => {
       const options: ChefOptions = { allowUrl: true }
 
       await expect(async () => await buildProject([recipe], undefined, options)).rejects.toThrow(
-        'Failed to fetch URL "https://example.com/error": 500 Internal Server Error'
+        'Failed to fetch URL "https://example.com/error": 500 Internal Server Error',
       )
     })
 
@@ -970,7 +982,7 @@ describe('URL Operations', () => {
         status: 200,
         statusText: 'OK',
         headers: {
-          get: (name: string) => name === 'content-type' ? 'image/jpeg' : null,
+          get: (name: string) => (name === 'content-type' ? 'image/jpeg' : null),
         },
         arrayBuffer: () => Promise.resolve(new ArrayBuffer(100)),
       })
@@ -979,8 +991,15 @@ describe('URL Operations', () => {
       const variables: Record<string, Json> = {}
       const options: ChefOptions = { allowUrl: true }
 
-      await expect(() => 
-        applyRecipeEditOperation(files, variables, 'image.jpg', { url: 'https://example.com/image.jpg' }, undefined, options)
+      await expect(() =>
+        applyRecipeEditOperation(
+          files,
+          variables,
+          'image.jpg',
+          { url: 'https://example.com/image.jpg' },
+          undefined,
+          options,
+        ),
       ).rejects.toThrow('binaryFiles parameter is required when fetching binary content from URL')
     })
 
@@ -1017,7 +1036,7 @@ describe('URL Operations', () => {
         status: 200,
         statusText: 'OK',
         headers: {
-          get: (name: string) => name === 'content-type' ? 'text/plain' : null,
+          get: (name: string) => (name === 'content-type' ? 'text/plain' : null),
         },
         text: () => Promise.resolve('Base content'),
       })
@@ -1053,7 +1072,7 @@ describe('URL Operations', () => {
         status: 200,
         statusText: 'OK',
         headers: {
-          get: (name: string) => name === 'content-type' ? 'application/json' : null,
+          get: (name: string) => (name === 'content-type' ? 'application/json' : null),
         },
         text: () => Promise.resolve('{"apiData": "success"}'),
       })

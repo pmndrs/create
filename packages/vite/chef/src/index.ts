@@ -1,14 +1,15 @@
 import type { Plugin, ResolvedConfig } from 'vite'
-import { readFileSync, existsSync } from 'fs'
 import { resolve, dirname, join } from 'path'
+import fs from 'fs/promises'
 import * as chef from '@pmndrs/chef'
 import type { Recipe } from '@pmndrs/chef'
 
 const { buildProject } = chef
 
-export type ResolveFunction = (name: string, versionQuery: string) => Recipe
+export type ResolveFunction = (name: string, versionQuery: string) => Promise<Recipe>
 
 export interface ChefPluginOptions {
+  fs?: typeof fs
   /**
    * Path to the main recipe file
    * @default 'recipe.json'
@@ -32,23 +33,19 @@ export interface ChefPluginOptions {
 }
 
 export async function chefPlugin(options: ChefPluginOptions = {}): Promise<Plugin> {
-  const { recipe = 'recipe.json', baseDir = process.cwd(), hmr = true, resolve: customResolve } = options
+  const { recipe = 'recipe.json', baseDir = process.cwd(), fs: _fs = fs, resolve: customResolve } = options
 
   let config: ResolvedConfig
 
   // Resolve the main recipe path
   const recipePath = resolve(baseDir, recipe)
 
-  function loadRecipe(recipePath: string): Recipe {
-    if (!existsSync(recipePath)) {
-      throw new Error(`Recipe file not found: ${recipePath}`)
-    }
-
-    const content = readFileSync(recipePath, 'utf-8')
+  async function loadRecipe(recipePath: string): Promise<Recipe> {
+    const content = await _fs.readFile(recipePath, 'utf-8')
     return JSON.parse(content)
   }
 
-  function resolveRequirements(name: string, versionQuery: string): Recipe {
+  async function resolveRequirements(name: string, versionQuery: string): Promise<Recipe> {
     // Use custom resolve function if provided
     if (customResolve) {
       return customResolve(name, versionQuery)
@@ -64,53 +61,12 @@ export async function chefPlugin(options: ChefPluginOptions = {}): Promise<Plugi
     ]
 
     for (const candidatePath of candidatePaths) {
-      if (existsSync(candidatePath)) {
+      try {
         return loadRecipe(candidatePath)
-      }
+      } catch {}
     }
 
     throw new Error(`Could not resolve recipe: ${name}`)
-  }
-
-  function getDependencies(recipePath: string): string[] {
-    const dependencies = [recipePath]
-    const visited = new Set<string>()
-
-    function collectDeps(path: string) {
-      if (visited.has(path)) return
-      visited.add(path)
-
-      try {
-        const recipe = loadRecipe(path)
-        if (recipe.requirements) {
-          const recipeDir = dirname(path)
-          for (const [name] of Object.entries(recipe.requirements)) {
-            // Skip dependency tracking if using custom resolve function
-            if (customResolve) continue
-
-            const candidatePaths = [
-              join(recipeDir, `${name}.json`),
-              join(recipeDir, `${name}.recipe.json`),
-              join(recipeDir, 'recipes', `${name}.json`),
-              join(recipeDir, 'recipes', `${name}.recipe.json`),
-            ]
-
-            for (const candidatePath of candidatePaths) {
-              if (existsSync(candidatePath)) {
-                dependencies.push(candidatePath)
-                collectDeps(candidatePath)
-                break
-              }
-            }
-          }
-        }
-      } catch (error) {
-        // Ignore errors for dependency collection
-      }
-    }
-
-    collectDeps(recipePath)
-    return dependencies
   }
 
   // Build the project using chef
@@ -123,9 +79,7 @@ export async function chefPlugin(options: ChefPluginOptions = {}): Promise<Plugi
     },
 
     async buildStart() {
-      const mainRecipe = loadRecipe(recipePath)
-      const dependencies = getDependencies(recipePath)
-      const timestamp = Date.now()
+      const mainRecipe = await loadRecipe(recipePath)
       files = await buildProject([mainRecipe], resolveRequirements)
     },
 
