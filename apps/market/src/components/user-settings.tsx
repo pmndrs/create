@@ -12,7 +12,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Copy, Eye, EyeOff, Key, RefreshCw, User, Shield, Bell, Palette, Github } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -49,7 +59,7 @@ export function UserSettings() {
   const [saving, setSaving] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
   const [regeneratingKey, setRegeneratingKey] = useState(false)
-  
+
   // Form states
   const [displayName, setDisplayName] = useState('')
   const [bio, setBio] = useState('')
@@ -58,11 +68,11 @@ export function UserSettings() {
     pushNotifications: false,
     recipeApprovals: true,
     newDependents: true,
-    securityAlerts: true
+    securityAlerts: true,
   })
   const [display, setDisplay] = useState<DisplaySettings>({
     theme: 'system',
-    compactMode: false
+    compactMode: false,
   })
 
   const fetchProfile = useCallback(async () => {
@@ -80,7 +90,7 @@ export function UserSettings() {
       toast({
         title: 'Error',
         description: 'Failed to load profile settings',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -97,7 +107,7 @@ export function UserSettings() {
     // Load from localStorage or API
     const savedNotifications = localStorage.getItem('notificationSettings')
     const savedDisplay = localStorage.getItem('displaySettings')
-    
+
     if (savedNotifications) {
       setNotifications(JSON.parse(savedNotifications))
     }
@@ -114,24 +124,24 @@ export function UserSettings() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: displayName || null,
-          bio
-        })
+          bio,
+        }),
       })
-      
+
       if (!response.ok) throw new Error('Failed to save profile')
-      
+
       toast({
         title: 'Success',
-        description: 'Profile updated successfully'
+        description: 'Profile updated successfully',
       })
-      
+
       fetchProfile() // Refresh profile data
     } catch (error) {
       console.error('Error saving profile:', error)
       toast({
         title: 'Error',
         description: 'Failed to save profile',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setSaving(false)
@@ -142,7 +152,7 @@ export function UserSettings() {
     localStorage.setItem('notificationSettings', JSON.stringify(notifications))
     toast({
       title: 'Success',
-      description: 'Notification preferences saved'
+      description: 'Notification preferences saved',
     })
   }
 
@@ -156,10 +166,10 @@ export function UserSettings() {
       const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       document.documentElement.classList.toggle('dark', systemDark)
     }
-    
+
     toast({
       title: 'Success',
-      description: 'Display preferences saved'
+      description: 'Display preferences saved',
     })
   }
 
@@ -168,7 +178,7 @@ export function UserSettings() {
       await navigator.clipboard.writeText(profile.apiKey)
       toast({
         title: 'Success',
-        description: 'API key copied to clipboard'
+        description: 'API key copied to clipboard',
       })
     }
   }
@@ -177,24 +187,24 @@ export function UserSettings() {
     try {
       setRegeneratingKey(true)
       const response = await fetch('/api/users/api-key/regenerate', {
-        method: 'POST'
+        method: 'POST',
       })
-      
+
       if (!response.ok) throw new Error('Failed to regenerate API key')
-      
+
       const data = await response.json()
-      setProfile(prev => prev ? { ...prev, apiKey: data.apiKey } : null)
-      
+      setProfile((prev) => (prev ? { ...prev, apiKey: data.apiKey } : null))
+
       toast({
         title: 'Success',
-        description: 'API key regenerated successfully'
+        description: 'API key regenerated successfully',
       })
     } catch (error) {
       console.error('Error regenerating API key:', error)
       toast({
         title: 'Error',
         description: 'Failed to regenerate API key',
-        variant: 'destructive'
+        variant: 'destructive',
       })
     } finally {
       setRegeneratingKey(false)
@@ -230,7 +240,7 @@ export function UserSettings() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Profile
@@ -239,23 +249,13 @@ export function UserSettings() {
             <Key className="h-4 w-4" />
             API Access
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="display" className="flex items-center gap-2">
-            <Palette className="h-4 w-4" />
-            Display
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
-                Update your profile information and GitHub account details
-              </CardDescription>
+              <CardDescription>Update your profile information and GitHub account details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center gap-6">
@@ -278,9 +278,7 @@ export function UserSettings() {
                       </Badge>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Connected via GitHub OAuth
-                  </p>
+                  <p className="text-sm text-muted-foreground">Connected via GitHub OAuth</p>
                 </div>
               </div>
 
@@ -298,15 +296,8 @@ export function UserSettings() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    value={profile.email}
-                    disabled
-                    className="bg-muted"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Email cannot be changed (managed by GitHub)
-                  </p>
+                  <Input id="email" value={profile.email} disabled className="bg-muted" />
+                  <p className="text-xs text-muted-foreground">Email cannot be changed (managed by GitHub)</p>
                 </div>
               </div>
 
@@ -337,9 +328,7 @@ export function UserSettings() {
           <Card>
             <CardHeader>
               <CardTitle>API Access</CardTitle>
-              <CardDescription>
-                Manage your API key for uploading recipes and accessing the API
-              </CardDescription>
+              <CardDescription>Manage your API key for uploading recipes and accessing the API</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
@@ -353,18 +342,10 @@ export function UserSettings() {
                       readOnly
                       className="font-mono"
                     />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setShowApiKey(!showApiKey)}
-                    >
+                    <Button variant="outline" size="icon" onClick={() => setShowApiKey(!showApiKey)}>
                       {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={copyApiKey}
-                    >
+                    <Button variant="outline" size="icon" onClick={copyApiKey}>
                       <Copy className="h-4 w-4" />
                     </Button>
                   </div>
@@ -373,14 +354,14 @@ export function UserSettings() {
                 <div className="bg-muted p-4 rounded-lg">
                   <h4 className="font-medium mb-2">Usage Example</h4>
                   <pre className="text-sm overflow-x-auto">
-{`curl -X POST https://market.pmndrs.com/api/recipes/upload \\
+                    {`curl -X POST https://market.pmndrs.com/api/recipes \\
   -H "x-api-key: ${showApiKey ? profile.apiKey : '••••••••••••••••'}" \\
   -H "Content-Type: application/json" \\
   -d '{
     "name": "my-recipe",
     "type": "ARTIFACT",
     "version": "1.0.0",
-    "content": {...}
+    "edits": {...}
   }'`}
                   </pre>
                 </div>
@@ -397,8 +378,8 @@ export function UserSettings() {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Regenerate API Key</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will generate a new API key and invalidate the current one. 
-                          You&apos;ll need to update any scripts or applications using the old key.
+                          This will generate a new API key and invalidate the current one. You&apos;ll need to update
+                          any scripts or applications using the old key.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -410,121 +391,6 @@ export function UserSettings() {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>
-                Choose what notifications you&apos;d like to receive
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive notifications via email
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notifications.emailNotifications}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, emailNotifications: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Recipe Approvals</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when your recipes are approved or rejected
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notifications.recipeApprovals}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, recipeApprovals: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>New Dependents</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get notified when someone uses your recipe as a dependency
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notifications.newDependents}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, newDependents: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Security Alerts</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Important security notifications about your account
-                    </p>
-                  </div>
-                  <Switch
-                    checked={notifications.securityAlerts}
-                    onCheckedChange={(checked) => 
-                      setNotifications(prev => ({ ...prev, securityAlerts: checked }))
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <Button onClick={saveNotifications}>
-                  Save Notification Preferences
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="display" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Display Settings</CardTitle>
-              <CardDescription>
-                Customize how the application looks and feels
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Compact Mode</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Use a more compact layout with smaller spacing
-                    </p>
-                  </div>
-                  <Switch
-                    checked={display.compactMode}
-                    onCheckedChange={(checked) => 
-                      setDisplay(prev => ({ ...prev, compactMode: checked }))
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <Button onClick={saveDisplay}>
-                  Save Display Preferences
-                </Button>
               </div>
             </CardContent>
           </Card>

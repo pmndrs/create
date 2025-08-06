@@ -4,7 +4,6 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { BuildService } from '@/lib/build-service'
 import { getRecipe } from '@/lib/recipe-service'
-import type { RecipeEditOperation } from '@pmndrs/chef'
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ name: string; version: string }> }) {
   try {

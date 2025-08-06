@@ -13,16 +13,15 @@ interface RecipeBrowserProps {
 
 export async function RecipeBrowser({ searchParams }: RecipeBrowserProps) {
   const { search, type, requirements, tags } = searchParams || {}
-  
+
   const where: Record<string, unknown> = {}
 
   if (search) {
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } }
+      { description: { contains: search, mode: 'insensitive' } },
     ]
   }
-
 
   if (type && type !== 'all') {
     where.type = type as RecipeType
@@ -35,10 +34,10 @@ export async function RecipeBrowser({ searchParams }: RecipeBrowserProps) {
         some: {
           requirement: {
             name: {
-              in: reqList
-            }
-          }
-        }
+              in: reqList,
+            },
+          },
+        },
       }
     }
   }
@@ -50,10 +49,10 @@ export async function RecipeBrowser({ searchParams }: RecipeBrowserProps) {
         some: {
           tag: {
             name: {
-              in: tagList
-            }
-          }
-        }
+              in: tagList,
+            },
+          },
+        },
       }
     }
   }
@@ -62,27 +61,34 @@ export async function RecipeBrowser({ searchParams }: RecipeBrowserProps) {
     where,
     include: {
       user: {
-        select: { name: true, email: true }
+        select: { name: true, email: true },
       },
       versions: {
         select: { id: true, version: true, approved: true },
         orderBy: { createdAt: 'desc' },
-        take: 1
+        take: 1,
+      },
+      dependentVersions: {
+        where: {
+          version: { approved: true },
+        },
+        distinct: 'versionRecipeId',
+        orderBy: { version: { createdAt: 'desc' } },
+        take: 4,
+        include: { version: { include: { recipe: { select: { name: true } } } } },
       },
       tags: {
-        include: { tag: true }
-      }
+        include: { tag: true },
+      },
     },
-    orderBy: { updatedAt: 'desc' }
+    orderBy: { updatedAt: 'desc' },
   })
 
   if (recipes.length === 0) {
     return (
       <div className="text-center py-12">
         <h3 className="text-lg font-medium mb-2">No recipes found</h3>
-        <p className="text-muted-foreground">
-          Try adjusting your filters or search terms.
-        </p>
+        <p className="text-muted-foreground">Try adjusting your filters or search terms.</p>
       </div>
     )
   }

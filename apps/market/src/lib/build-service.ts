@@ -1,5 +1,4 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
-import { prisma } from '@/lib/prisma'
 import { build } from 'vite'
 import react from '@vitejs/plugin-react'
 import { Recipe, resolveRequirements } from '@pmndrs/chef'
@@ -105,11 +104,17 @@ export class BuildService {
     const thumbnailUrl = `https://pub-54e2a7dbf936490fae36efbdea022cba.r2.dev/${recipe.name}/${recipe.version}/index.html`
 
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
     const page = await browser.newPage()
     await page.setViewport({ width: 1280, height: 720 })
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115 Safari/537.36',
+    )
+    await page.setExtraHTTPHeaders({
+      'Accept-Language': 'en-US,en;q=0.9',
+    })
 
     await page.goto(thumbnailUrl, {
       waitUntil: 'networkidle0',
@@ -122,13 +127,15 @@ export class BuildService {
       quality: 80,
     })
 
+    await browser.close()
+
     // Upload thumbnail to S3
     await s3Client.send(
       new PutObjectCommand({
         Bucket: process.env.S3_EXAMPLE_THUMBNAIL_BUCKET!,
         Key: `${recipe.name}/${recipe.version}/thumbnail.webp`,
         Body: screenshot,
-        ContentType: 'image/webp'
+        ContentType: 'image/webp',
       }),
     )
   }

@@ -149,6 +149,7 @@ model RecipeVersionRequirement {
   versionId         String // The recipe version that has the requirement
   requiredRecipeId  String // The recipe that is required
   versionRange      String // semver range like "^1.0.0"
+  versionRecipeId   String
 
   // Relations
   version        RecipeVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)

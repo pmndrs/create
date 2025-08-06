@@ -27,42 +27,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       return NextResponse.json({ error: 'Recipe not found' }, { status: 404 })
     }
 
-    // For artifact recipes, find primary example if exists
-    let primaryExample = null
-    if (recipe.type === 'ARTIFACT') {
-      primaryExample = await prisma.recipe.findFirst({
-        where: {
-          type: 'EXAMPLE',
-          versions: {
-            some: {
-              approved: true,
-              requirements: {
-                some: {
-                  requiredRecipeId: recipe.id,
-                },
-              },
-            },
-          },
-        },
-        include: {
-          versions: {
-            where: {
-              approved: true,
-              requirements: {
-                some: {
-                  requiredRecipeId: recipe.id,
-                },
-              },
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 1,
-          },
-        },
-      })
-    }
 
     // For example recipes, find similar examples
-    let similarExamples: any[] = []
+    let similarExamples: Array<{
+      id: string
+      name: string
+      type: string
+      user: { name: string | null }
+      versions: Array<{ id: string; version: string; approved: boolean }>
+    }> = []
     if (recipe.type === 'EXAMPLE') {
       // Get the latest approved version's requirements
       const latestVersion = recipe.versions.find((v) => v.approved)
@@ -84,10 +57,8 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
             some: {
               requirements: {
                 some: {
-                  requiredRecipe: {
-                    name: {
-                      in: requirementNames,
-                    },
+                  requiredRecipeId: {
+                    in: requirementNames,
                   },
                 },
               },
@@ -110,7 +81,6 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
     return NextResponse.json({
       ...recipe,
-      primaryExample,
       similarExamples,
     })
   } catch (error) {

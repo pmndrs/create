@@ -97,7 +97,6 @@ export function AdminPanel() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="builds">Build Queue</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
 
@@ -189,10 +188,6 @@ export function AdminPanel() {
               ))}
             </div>
           )}
-        </TabsContent>
-
-        <TabsContent value="builds" className="mt-6">
-          <p className="text-muted-foreground">Build queue system coming soon</p>
         </TabsContent>
 
         <TabsContent value="users" className="mt-6">

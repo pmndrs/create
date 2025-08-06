@@ -67,25 +67,12 @@ export async function POST(request: NextRequest) {
       if (validatedData.tags && validatedData.tags.length > 0) {
         for (const tagName of validatedData.tags) {
           // Get or create tag
-          const tag = await prisma.tag.upsert({
+          await prisma.tag.upsert({
             where: { name: tagName },
             create: { name: tagName },
-            update: {},
-          })
-
-          // Link tag to recipe
-          await prisma.recipeTag.upsert({
-            where: {
-              recipeId_tagId: {
-                recipeId: recipe.id,
-                tagId: tag.id,
-              },
+            update: {
+              recipes: { create: { recipeId: recipe.id } },
             },
-            create: {
-              recipeId: recipe.id,
-              tagId: tag.id,
-            },
-            update: {},
           })
         }
       }
@@ -112,43 +99,17 @@ export async function POST(request: NextRequest) {
         version: validatedData.version,
         edits: validatedData.edits as Prisma.JsonObject,
         approved: false,
+        requirements: {
+          create: Object.entries(validatedData.requirements ?? {}).map(([name, versionRange]) => ({
+            requiredRecipe: {
+              connect: { name },
+            },
+            versionRange,
+            versionRecipeId: recipe.id,
+          })),
+        },
       },
     })
-
-    // Add dependencies from both sources
-    const dependenciesToProcess: Array<{ name: string; versionRange: string }> = []
-
-    // From API dependencies array
-    if (validatedData.dependencies && validatedData.dependencies.length > 0) {
-      dependenciesToProcess.push(...validatedData.dependencies)
-    }
-
-    // From recipe file requirements object
-    if (validatedData.requirements) {
-      for (const [name, versionRange] of Object.entries(validatedData.requirements)) {
-        dependenciesToProcess.push({ name, versionRange })
-      }
-    }
-
-    // Process all dependencies
-    for (const dep of dependenciesToProcess) {
-      // Find the required recipe by name
-      const requiredRecipe = await prisma.recipe.findFirst({
-        where: { name: dep.name },
-      })
-
-      if (requiredRecipe) {
-        await prisma.recipeVersionRequirement.create({
-          data: {
-            versionId: version.id,
-            requiredRecipeId: requiredRecipe.id,
-            versionRange: dep.versionRange,
-          },
-        })
-      } else {
-        console.warn(`Required recipe "${dep.name}" not found, skipping dependency`)
-      }
-    }
 
     return NextResponse.json({
       success: true,

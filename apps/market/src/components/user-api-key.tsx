@@ -85,7 +85,7 @@ export function UserApiKey({ initialApiKey }: UserApiKeyProps) {
         <div className="text-sm text-muted-foreground space-y-2">
           <p>Use this API key to upload recipes:</p>
           <pre className="bg-muted p-2 rounded text-xs overflow-x-auto">
-{`curl -X POST http://localhost:3000/api/recipes/upload \\
+{`curl -X POST ${window.location.origin}/api/recipes \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: ${showApiKey ? apiKey : '••••••••••••••••••••••••••••••••••••••••'}" \\
   -d @recipe.json`}

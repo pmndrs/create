@@ -20,6 +20,23 @@ export default async function RecipePage({ params }: RecipePageProps) {
       tags: {
         include: { tag: true },
       },
+      dependentVersions: {
+        distinct: 'versionRecipeId',
+        where: {
+          version: {
+            recipe: {
+              type: 'EXAMPLE',
+            },
+          },
+        },
+        take: 5,
+        orderBy: { version: { createdAt: 'desc' } },
+        include: {
+          version: {
+            include: { recipe: { include: { tags: { include: { tag: true } }, user: true, versions: true } } },
+          },
+        },
+      },
       versions: {
         where: {
           version: decodeURIComponent(version),

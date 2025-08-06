@@ -118,7 +118,7 @@ The application uses the following main models:
 - `GET /api/tags` - Get all tags
 
 ### Authenticated Endpoints
-- `POST /api/recipes/upload` - Upload recipe (requires API key)
+- `POST /api/recipes` - Upload recipe (requires API key)
 - `GET /api/users/api-key` - Get user's API key
 - `POST /api/users/api-key/regenerate` - Regenerate API key
 
@@ -143,7 +143,7 @@ The application uses the following main models:
 ### API Usage Example
 
 ```bash
-curl -X POST http://localhost:3000/api/recipes/upload \
+curl -X POST http://localhost:3000/api/recipes \
   -H "Content-Type: application/json" \
   -H "x-api-key: your-api-key" \
   -d '{
@@ -151,12 +151,7 @@ curl -X POST http://localhost:3000/api/recipes/upload \
     "category": "components",
     "type": "ARTIFACT",
     "version": "1.0.0",
-    "content": {
-      "name": "my-component",
-      "edits": {
-        "src/Component.tsx": "export const Component = () => <div>Hello</div>"
-      }
-    },
+    "edits": {},
     "tags": ["react", "component"]
   }'
 ```
