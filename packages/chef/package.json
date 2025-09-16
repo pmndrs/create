@@ -1,6 +1,6 @@
 {
   "name": "@pmndrs/chef",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "description": "Chef takes recipes and cooks your projects.",
   "main": "src/index.ts",
   "publishConfig": {

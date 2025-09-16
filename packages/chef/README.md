@@ -29,7 +29,7 @@
 ```
 
 *Notice*
-- folders are not allowed to contain `.` in their name
+- files must contain a `.` in their name
 - files are not allowed to start with `@`
 - strings in edits are always seen as raw values e.g. `{ "test": "123" }` will end up in the finap project as `{ "test": 123 }`. To achieve `{ "test": "123" }` in the project, additional quotes are necassary: `{ "test": "'123'" }`
 - using the string edit `'{ "test": "123" }'` is the same as using the json edit `{ "test": "'123'" }`

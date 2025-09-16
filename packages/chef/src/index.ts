@@ -308,7 +308,7 @@ function parsePath(path: string): { isFile: boolean; name: string; valuePath: Ar
   const isFile = !path.startsWith('@')
   let searchStartIndex: number | undefined
   if (isFile) {
-    searchStartIndex = path.indexOf('.')
+    searchStartIndex = path.lastIndexOf('.')
     if (searchStartIndex === -1) {
       throw new Error(`files must include a "." for the file extension`)
     }
