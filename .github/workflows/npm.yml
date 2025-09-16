@@ -35,18 +35,18 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-#      - name: Check
-#        run: |
-#          pnpm -r check:prettier
-#          pnpm -r check:eslint
-#
-#      - name: Build
-#        run: |
-#          pnpm -r build
-#
-#      - name: Copy README
-#        run: cp ./README.md packages/react-three-create
-#
+      #      - name: Check
+      #        run: |
+      #          pnpm -r check:prettier
+      #          pnpm -r check:eslint
+      #
+      - name: Build
+        run: |
+          pnpm -r build
+      #
+      #      - name: Copy README
+      #        run: cp ./README.md packages/react-three-create
+      #
       - name: Gitversion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0
