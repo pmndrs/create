@@ -47,7 +47,7 @@ async function promptForOptions(name: string): Promise<GenerateOptions & { skipS
           type: 'text',
           name: 'name',
           message: 'What is your project named?',
-          initial: 'react-three-app',
+          initial: `react-three-${generateRandomName()}`,
           validate: (name: string) => (name.length > 0 ? true : 'Project name is required'),
         },
         {
@@ -203,7 +203,7 @@ async function main() {
 
       if (options.url) {
         generateOptions = await loadOptionsFromUrl(options.url)
-        generateOptions.name ??= name
+        generateOptions.name ??= name || `react-three-${generateRandomName()}`
       } else if (Object.keys(options).length > 0) {
         generateOptions = {
           name,
