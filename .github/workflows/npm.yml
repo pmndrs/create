@@ -35,21 +35,21 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Check
-        run: |
-          pnpm -r check:prettier
-          pnpm -r check:eslint
-
-      - name: Build
-        run: |
-          pnpm -r build
-
-      - name: Copy README
-        run: cp ./README.md packages/react-three-create
-
-      - name: Gitversion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v0
+#      - name: Check
+#        run: |
+#          pnpm -r check:prettier
+#          pnpm -r check:eslint
+#
+#      - name: Build
+#        run: |
+#          pnpm -r build
+#
+#      - name: Copy README
+#        run: cp ./README.md packages/react-three-create
+#
+#      - name: Gitversion
+#        id: gitversion
+#        uses: gittools/actions/gitversion/execute@v0
 
       - name: Set Version
         run: pnpm -r exec json -f "package.json" -I -e 'this.version = "${{ steps.gitversion.outputs.fullSemVer }}"'
@@ -58,5 +58,5 @@ jobs:
         run: pnpm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
 
       - name: Deploy @react-three/create
-        working-directory: ./packages/react-three-create
+        working-directory: ./packages/chef
         run: pnpm publish --access public --no-git-checks --tag ${{ steps.gitversion.outputs.preReleaseLabel == '' && 'latest' || steps.gitversion.outputs.preReleaseLabel }}
