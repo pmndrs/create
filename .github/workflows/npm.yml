@@ -42,7 +42,7 @@ jobs:
       #
       - name: Build
         run: |
-          pnpm -r build
+          pnpm --filter '@pmndrs/chef' build
       #
       #      - name: Copy README
       #        run: cp ./README.md packages/react-three-create
